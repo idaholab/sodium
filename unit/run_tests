@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# If $METHOD is not set, use opt
+if [ -z $METHOD ]; then
+  export METHOD=opt
+fi
+
+if [ -e ./unit/sodium-unit-$METHOD ]
+then
+  ./unit/sodium-unit-$METHOD
+elif [ -e ./sodium-unit-$METHOD ]
+then
+  ./sodium-unit-$METHOD
+else
+  echo "Executable missing!"
+  exit 1
+fi

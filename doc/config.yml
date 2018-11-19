@@ -1,0 +1,34 @@
+Content:
+    iapws95:
+        root_dir: doc/content
+
+Renderer:
+    type: MooseDocs.base.MaterializeRenderer
+    name: sodium
+    repo: https://hpcgitlab.inl.gov/idaholab/sodium
+    home: https://hpcsc.inl.gov/ssl/sodium/site/
+    navigation:
+        Developers:
+            Workflow: workflow.md
+            Build Status: https://moosebuild.inl.gov/repo/idaholab/sodium
+
+Extensions:
+    appsyntax:
+        type: MooseDocs.extensions.appsyntax
+        executable: ${ROOT_DIR}
+        hide:
+            framework: !include ${MOOSE_DIR}/framework/doc/hidden.yml
+            fluid_properties: !include ${MOOSE_DIR}/modules/fluid_properties/doc/hidden.yml
+        includes:
+            - include
+            - ${MOOSE_DIR}/framework/include
+            - ${MOOSE_DIR}/modules/fluid_properties/include
+        remove:
+            framework: !include ${MOOSE_DIR}/framework/doc/remove.yml
+    globals:
+        type: MooseDocs.extensions.panoptic
+        shortcuts:
+            framework: !include ${MOOSE_DIR}/framework/doc/globals.yml
+    acronyms:
+        type: MooseDocs.extensions.acronym
+        acronyms: !include ${MOOSE_DIR}/framework/doc/acronyms.yml
