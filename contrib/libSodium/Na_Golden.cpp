@@ -1,7 +1,7 @@
 #include "math.h"
 #include "Na_Golden.h"
 //
-int
+void
 DIFF_ps_t_Na(double t, double & ps, double & dpsdt, double & d2psdt2)
 { // units: R, atm
   static const double a1 = 3.03266e6;
@@ -38,10 +38,9 @@ DIFF_ps_t_Na(double t, double & ps, double & dpsdt, double & d2psdt2)
     dpsdt = -ps * (c2 / (t * t) + b2 / t);
     d2psdt2 = -dpsdt * (c2 / (t * t) + b2 / t) - ps * (-2. * c2 / (t * t * t) - b2 / (t * t));
   }
-  return 0;
 }
 //
-int
+void
 DIFF_ps_t_Na(double t, double & ps, double & dpsdt, double & d2psdt2, double & d3psdt3)
 { // units: R, atm
   static const double a1 = 3.03266e6;
@@ -95,7 +94,6 @@ DIFF_ps_t_Na(double t, double & ps, double & dpsdt, double & d2psdt2, double & d
               dpsdt * (-2. * c2 / (t * t * t) - b2 / (t * t)) -
               ps * (6. * c2 / (t * t * t * t) + 2. * b2 / (t * t * t));
   }
-  return 0;
 }
 //
 int
@@ -126,7 +124,7 @@ DIFF_ts_p_Na(double p, double & ts, double & dtsdp, double & d2tsdp2)
   return 0;
 }
 //
-int
+void
 DIFF_d1_t_Na(double t, double & d1, double & dd1dt, double & d2d1dt2)
 { // units: R, lb/ft3
   double tt;
@@ -140,10 +138,9 @@ DIFF_d1_t_Na(double t, double & d1, double & dd1dt, double & d2d1dt2)
   d1 = a + tt * (b + tt * (c + tt * d));
   dd1dt = b + tt * (2. * c + tt * 3. * d);
   d2d1dt2 = 2. * c + tt * 6. * d;
-  return 0;
 }
 //
-int
+void
 DIFF_d1_t_Na(double t, double & d1, double & dd1dt, double & d2d1dt2, double & d3d1dt3)
 { // units: R, lb/ft3
   double tt;
@@ -158,21 +155,18 @@ DIFF_d1_t_Na(double t, double & d1, double & dd1dt, double & d2d1dt2, double & d
   dd1dt = b + tt * (2. * c + tt * 3. * d);
   d2d1dt2 = 2. * c + tt * 6. * d;
   d3d1dt3 = 6. * d;
-  return 0;
 }
 //
-int
+void
 DIFF_v1_t_Na(double t, double & v1, double & dv1dt, double & d2v1dt2)
 { // units: R, ft3/lb
   double d1, dd1dt, d2d1dt2;
-  int ierr;
   //
-  ierr = DIFF_d1_t_Na(t, d1, dd1dt, d2d1dt2);
+  DIFF_d1_t_Na(t, d1, dd1dt, d2d1dt2);
   //
   v1 = 1. / d1;
   dv1dt = -dd1dt * v1 * v1;
   d2v1dt2 = v1 * v1 * (dd1dt * dd1dt * 2. * v1 - d2d1dt2);
-  return 0;
 }
 //
 //-----------------------------------------------------------------------------
@@ -181,7 +175,7 @@ DIFF_v1_t_Na(double t, double & v1, double & dv1dt, double & d2v1dt2)
 // v(p,T) has a derivative of p now, which needs to be considered in DLP for h and s too!
 void
 betat_t_Na(double t, double & betat, double & dbetatdt, double & d2betatdt2)
-{ //R, ...
+{ // R, ...
   // betat equation in 1/MPa as a function of T in K
   double dbetatdt_i, d2betatdt2_i;
   double dbetatdt_int, d2betatdt2_int;
@@ -219,7 +213,7 @@ betat_t_Na(double t, double & betat, double & dbetatdt, double & d2betatdt2)
 //
 void
 betat_t_Na(double t, double & betat, double & dbetatdt, double & d2betatdt2, double & d3betatdt3)
-{ //R, 1/atm
+{ // R, 1/atm
   // betat equation in 1/MPa as a function of T*T (T in K)
   double dbetatdt_i, d2betatdt2_i, d3betatdt3_i;
   double dbetatdt_int, d2betatdt2_int, d3betatdt3_int;
@@ -288,7 +282,7 @@ betat_t_Na(double t, double & betat, double & dbetatdt, double & d2betatdt2, dou
 //    d3betatdt3=((60.*4.735252372712e-23)*t - 24.*1.654611480261e-19)*t + 6.*8.679384637566e-16;
 //}
 //
-int
+void
 DIFF_d_tp_L_Na(double t,
                double p,
                double & dl,
@@ -299,10 +293,9 @@ DIFF_d_tp_L_Na(double t,
                double & d2dldtdp)
 { // units: R, atm, lb/ft3
   double d1, dd1dt, d2d1dt2, ps, dpsdt, d2psdt2, betat, dbetatdt, d2betatdt2;
-  int ierr;
   //
-  ierr = DIFF_d1_t_Na(t, d1, dd1dt, d2d1dt2);
-  ierr = DIFF_ps_t_Na(t, ps, dpsdt, d2psdt2);
+  DIFF_d1_t_Na(t, d1, dd1dt, d2d1dt2);
+  DIFF_ps_t_Na(t, ps, dpsdt, d2psdt2);
   betat_t_Na(t, betat, dbetatdt, d2betatdt2);
   //
   dl = d1 + d1 * betat * (p - ps);
@@ -314,11 +307,9 @@ DIFF_d_tp_L_Na(double t,
   ddldp = d1 * betat;
   d2dldp2 = 0.;
   d2dldtdp = dd1dt * betat + d1 * dbetatdt;
-  //
-  return 0;
 }
 //
-int
+void
 DIFF_d_tp_L_Na(double t,
                double p,
                double & dl,
@@ -333,10 +324,9 @@ DIFF_d_tp_L_Na(double t,
 { // units: R, atm, lb/ft3
   double d1, dd1dt, d2d1dt2, d3d1dt3, ps, dpsdt, d2psdt2, d3psdt3, betat, dbetatdt, d2betatdt2,
       d3betatdt3;
-  int ierr;
   //
-  ierr = DIFF_d1_t_Na(t, d1, dd1dt, d2d1dt2, d3d1dt3);
-  ierr = DIFF_ps_t_Na(t, ps, dpsdt, d2psdt2, d3psdt3);
+  DIFF_d1_t_Na(t, d1, dd1dt, d2d1dt2, d3d1dt3);
+  DIFF_ps_t_Na(t, ps, dpsdt, d2psdt2, d3psdt3);
   betat_t_Na(t, betat, dbetatdt, d2betatdt2, d3betatdt3);
   //
   dl = d1 + d1 * betat * (p - ps);
@@ -357,11 +347,9 @@ DIFF_d_tp_L_Na(double t,
   d2dldtdp = dd1dt * betat + d1 * dbetatdt;
   d3dldtdp2 = 0.0;
   d3dldt2dp = d2d1dt2 * betat + 2. * dd1dt * dbetatdt + d1 * d2betatdt2;
-  //
-  return 0;
 }
 //
-int
+void
 DIFF_v_tp_L_Na(double t,
                double p,
                double & vl,
@@ -381,11 +369,9 @@ DIFF_v_tp_L_Na(double t,
   dvldp = -ddldp * vl * vl;
   d2vldp2 = -d2dldp2 * vl * vl - 2. * ddldp * vl * dvldp;
   d2vldtdp = -d2dldtdp * vl * vl - 2. * ddldt * vl * dvldp;
-  //
-  return 0;
 }
 //
-int
+void
 DIFF_h1_t_Na(double t, double & h1, double & dh1dt, double & d2h1dt2)
 { // units: R, Btu/lb
   static const double a = -29.02;
@@ -396,10 +382,9 @@ DIFF_h1_t_Na(double t, double & h1, double & dh1dt, double & d2h1dt2)
   h1 = a + t * (b + t * (c + t * d));
   dh1dt = b + t * (2. * c + t * 3. * d);
   d2h1dt2 = 2. * c + t * 6. * d;
-  return 0;
 }
 //
-int
+void
 DIFF_vu_tp_L_Na(double t,
                 double p,
                 double & vl,
@@ -415,7 +400,6 @@ DIFF_vu_tp_L_Na(double t,
                 double & d2uldp2,
                 double & d2uldtdp)
 { // units: R, atm, Btu/lb
-
   static const double atmft3_toBtu = (101325. * 0.3048 * 0.3048 * 0.3048) / 1055.05585262;
 
   double h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
@@ -428,10 +412,9 @@ DIFF_vu_tp_L_Na(double t,
   duldp = dhdp - (vl + p * dvldp) * atmft3_toBtu;
   d2uldp2 = d2hdp2 - (dvldp + dvldp + p * d2vldp2) * atmft3_toBtu;
   d2uldtdp = d2hdtdp - (dvldt + p * d2vldtdp) * atmft3_toBtu;
-  return 0;
 }
 //
-int
+void
 DIFF_h_tp_L_Na(double t,
                double p,
                double & hl,
@@ -445,13 +428,11 @@ DIFF_h_tp_L_Na(double t,
   double dl, ddldt, d2dldt2, d3dldt3, ddldp, d2dldp2, d2dldtdp, d3dldt2dp, d3dldtdp2;
   double term0, dterm0dt, d2term0dt2, dterm0dp, d2term0dp2, d2term0dtdp, term1, dterm1dt,
       d2term1dt2, dterm1dp, d2term1dp2, d2term1dtdp, term2;
-  int ierr;
   static const double b = 2.721308;
   //
-  ierr = DIFF_ps_t_Na(t, ps, dpsdt, d2psdt2);
-  ierr = DIFF_h1_t_Na(t, h1, dh1dt, d2h1dt2);
-  ierr = DIFF_d_tp_L_Na(
-      t, p, dl, ddldt, d2dldt2, d3dldt3, ddldp, d2dldp2, d2dldtdp, d3dldt2dp, d3dldtdp2);
+  DIFF_ps_t_Na(t, ps, dpsdt, d2psdt2);
+  DIFF_h1_t_Na(t, h1, dh1dt, d2h1dt2);
+  DIFF_d_tp_L_Na(t, p, dl, ddldt, d2dldt2, d3dldt3, ddldp, d2dldp2, d2dldtdp, d3dldt2dp, d3dldtdp2);
   //
   dlp = ddldt;
   ddlpdt = d2dldt2;
@@ -490,11 +471,9 @@ DIFF_h_tp_L_Na(double t,
               dterm0dp * (dterm1dt * term2 - term1 * dpsdt) +
               term0 * (d2term1dtdp * term2 + dterm1dt - dterm1dp * dpsdt)) *
              b;
-  //
-  return 0;
 }
 //
-int
+void
 DIFF_s1_t_Na(double t, double & s1, double & ds1dt, double & d2s1dt2)
 { // units: R, Btu/(lb*F)
   static const double a = 0.389344;
@@ -505,10 +484,9 @@ DIFF_s1_t_Na(double t, double & s1, double & ds1dt, double & d2s1dt2)
   s1 = a * log(t) + t * (b + c * t) + d;
   ds1dt = a / t + b + 2. * c * t;
   d2s1dt2 = -a / (t * t) + 2. * c;
-  return 0;
 }
 //
-int
+void
 DIFF_s_tp_L_Na(double t,
                double p,
                double & sl,
@@ -521,13 +499,11 @@ DIFF_s_tp_L_Na(double t,
   double ps, dpsdt, d2psdt2, s1, ds1dt, d2s1dt2, dlp, ddlpdt, d2dlpdt2, ddlpdp, d2dlpdp2, d2dlpdtdp;
   double dl, ddldt, d2dldt2, d3dldt3, ddldp, d2dldp2, d2dldtdp, d3dldt2dp, d3dldtdp2;
   double dl_inv, term0, dterm0dt, d2term0dt2, dterm0dp, d2term0dp2, d2term0dtdp, term2;
-  int ierr;
   static const double b = 2.721308;
   //
-  ierr = DIFF_ps_t_Na(t, ps, dpsdt, d2psdt2);
-  ierr = DIFF_s1_t_Na(t, s1, ds1dt, d2s1dt2);
-  ierr = DIFF_d_tp_L_Na(
-      t, p, dl, ddldt, d2dldt2, d3dldt3, ddldp, d2dldp2, d2dldtdp, d3dldt2dp, d3dldtdp2);
+  DIFF_ps_t_Na(t, ps, dpsdt, d2psdt2);
+  DIFF_s1_t_Na(t, s1, ds1dt, d2s1dt2);
+  DIFF_d_tp_L_Na(t, p, dl, ddldt, d2dldt2, d3dldt3, ddldp, d2dldp2, d2dldtdp, d3dldt2dp, d3dldtdp2);
   //
   dlp = ddldt;
   ddlpdt = d2dldt2;
@@ -559,13 +535,11 @@ DIFF_s_tp_L_Na(double t,
               dterm0dp * (ddlpdt * term2 - dlp * dpsdt) +
               term0 * (d2dlpdtdp * term2 + ddlpdt - ddlpdp * dpsdt)) *
              b;
-
-  return 0;
 }
 //
 //
 //
-int
+void
 DIFF_qc_t_Na(double t,
              double ps,
              double dpsdt,
@@ -675,11 +649,9 @@ DIFF_qc_t_Na(double t,
   ddendt = 2. * bd * dbddt;
   db4dt = 4. * num / den;
   d2b4dt2 = 4. * (dnumdt * den - num * ddendt) / (den * den);
-  //
-  return 0;
 }
 //
-int
+void
 DIFF_qc_tp_Na(double t,
               double p,
               double & x1,
@@ -874,46 +846,43 @@ DIFF_qc_tp_Na(double t,
   d2b4dp2 = 4. * (dpnumdp * den - pnum * ddendp) / (den * den);
   dtnumdp = d2x4dtdp * bd + dx4dt * dbddp - dx4dp * dbddt - x4 * d2bddtdp;
   d2b4dtdp = 4. * (dtnumdp * den - tnum * ddendp) / (den * den);
-  //
-  return 0;
 }
 //
-int
+void
 DIFF_v2_t_Na(double t, double & v2, double & dv2dt, double & d2v2dt2)
 { // units: R, ft3/lb
   double ps, dpsdt, d2psdt2, x1, dx1dt, d2x1dt2, x2, dx2dt, d2x2dt2, x4, dx4dt, d2x4dt2, abar,
       dabardt, d2abardt2, bd, dbddt, d2bddt2, b2, db2dt, d2b2dt2, b4, db4dt, d2b4dt2;
   double num, dnumdt, den, ddendt;
-  int ierr;
   //
   static const double R = 0.730229;
   //
-  ierr = DIFF_ps_t_Na(t, ps, dpsdt, d2psdt2);
-  ierr = DIFF_qc_t_Na(t,
-                      ps,
-                      dpsdt,
-                      d2psdt2,
-                      x1,
-                      dx1dt,
-                      d2x1dt2,
-                      x2,
-                      dx2dt,
-                      d2x2dt2,
-                      x4,
-                      dx4dt,
-                      d2x4dt2,
-                      abar,
-                      dabardt,
-                      d2abardt2,
-                      bd,
-                      dbddt,
-                      d2bddt2,
-                      b2,
-                      db2dt,
-                      d2b2dt2,
-                      b4,
-                      db4dt,
-                      d2b4dt2);
+  DIFF_ps_t_Na(t, ps, dpsdt, d2psdt2);
+  DIFF_qc_t_Na(t,
+               ps,
+               dpsdt,
+               d2psdt2,
+               x1,
+               dx1dt,
+               d2x1dt2,
+               x2,
+               dx2dt,
+               d2x2dt2,
+               x4,
+               dx4dt,
+               d2x4dt2,
+               abar,
+               dabardt,
+               d2abardt2,
+               bd,
+               dbddt,
+               d2bddt2,
+               b2,
+               db2dt,
+               d2b2dt2,
+               b4,
+               db4dt,
+               d2b4dt2);
   //
   v2 = R * t / (abar * ps);
   num = abar * ps - t * (dabardt * ps + abar * dpsdt);
@@ -923,10 +892,9 @@ DIFF_v2_t_Na(double t, double & v2, double & dv2dt, double & d2v2dt2)
   ddendt = 2. * (abar * ps) * (dabardt * ps + abar * dpsdt);
   dv2dt = R * num / den;
   d2v2dt2 = R * (dnumdt * den - num * ddendt) / (den * den);
-  return 0;
 }
 //
-int
+void
 DIFF_v_tp_G_Na(double t,
                double p,
                double & vv,
@@ -942,54 +910,53 @@ DIFF_v_tp_G_Na(double t,
       d2bdhdtdp, b2h, db2hdt, d2b2hdt2, db2hdp, d2b2hdp2, d2b2hdtdp, b4h, db4hdt, d2b4hdt2, db4hdp,
       d2b4hdp2, d2b4hdtdp;
   double den, ddendt, d2dendt2, ddendp, d2dendp2, d2dendtdp, num_dt, dnum_dtdt, den1, dden1dt;
-  int ierr;
   //
   static const double R = 0.730229;
   //
-  ierr = DIFF_qc_tp_Na(t,
-                       p,
-                       x1h,
-                       dx1hdt,
-                       d2x1hdt2,
-                       dx1hdp,
-                       d2x1hdp2,
-                       d2x1hdtdp,
-                       x2h,
-                       dx2hdt,
-                       d2x2hdt2,
-                       dx2hdp,
-                       d2x2hdp2,
-                       d2x2hdtdp,
-                       x4h,
-                       dx4hdt,
-                       d2x4hdt2,
-                       dx4hdp,
-                       d2x4hdp2,
-                       d2x4hdtdp,
-                       abarh,
-                       dabarhdt,
-                       d2abarhdt2,
-                       dabarhdp,
-                       d2abarhdp2,
-                       d2abarhdtdp,
-                       bdh,
-                       dbdhdt,
-                       d2bdhdt2,
-                       dbdhdp,
-                       d2bdhdp2,
-                       d2bdhdtdp,
-                       b2h,
-                       db2hdt,
-                       d2b2hdt2,
-                       db2hdp,
-                       d2b2hdp2,
-                       d2b2hdtdp,
-                       b4h,
-                       db4hdt,
-                       d2b4hdt2,
-                       db4hdp,
-                       d2b4hdp2,
-                       d2b4hdtdp);
+  DIFF_qc_tp_Na(t,
+                p,
+                x1h,
+                dx1hdt,
+                d2x1hdt2,
+                dx1hdp,
+                d2x1hdp2,
+                d2x1hdtdp,
+                x2h,
+                dx2hdt,
+                d2x2hdt2,
+                dx2hdp,
+                d2x2hdp2,
+                d2x2hdtdp,
+                x4h,
+                dx4hdt,
+                d2x4hdt2,
+                dx4hdp,
+                d2x4hdp2,
+                d2x4hdtdp,
+                abarh,
+                dabarhdt,
+                d2abarhdt2,
+                dabarhdp,
+                d2abarhdp2,
+                d2abarhdtdp,
+                bdh,
+                dbdhdt,
+                d2bdhdt2,
+                dbdhdp,
+                d2bdhdp2,
+                d2bdhdtdp,
+                b2h,
+                db2hdt,
+                d2b2hdt2,
+                db2hdp,
+                d2b2hdp2,
+                d2b2hdtdp,
+                b4h,
+                db4hdt,
+                d2b4hdt2,
+                db4hdp,
+                d2b4hdp2,
+                d2b4hdtdp);
   //
   den = abarh * p;
   ddendt = dabarhdt * p;
@@ -1007,18 +974,15 @@ DIFF_v_tp_G_Na(double t,
   dvvdp = -R * t / (den * den) * ddendp;
   d2vvdp2 = R * t * (2. / (den * den * den) * ddendp * ddendp - d2dendp2 / (den * den));
   d2vvdtdp = -R * ((den1 - t * dden1dt) / (den1 * den1) * ddendp + t / (den * den) * d2dendtdp);
-  //
-  return 0;
 }
 //
-int
+void
 DIFF_dhv_t_Na(double t, double & dhv, double & ddhvdt, double & d2dhvdt2)
 { // units: R, Btu/lb
   double ps, dpsdt, d2psdt2, x1, dx1dt, d2x1dt2, x2, dx2dt, d2x2dt2, x4, dx4dt, d2x4dt2, abar,
       dabardt, d2abardt2, bd, dbddt, d2bddt2, b2, db2dt, d2b2dt2, b4, db4dt, d2b4dt2;
   double dhf1, ddhf1dt, d2dhf1dt2, dhf2, ddhf2dt, d2dhf2dt2;
   double dhf4, ddhf4dt, d2dhf4dt2, num, dnumdt, d2numdt2;
-  int ierr;
   //
   static const double a = 25980.7;
   static const double b = -2.21312;
@@ -1027,32 +991,32 @@ DIFF_dhv_t_Na(double t, double & dhv, double & ddhvdt, double & d2dhvdt2)
   static const double e2 = -18304.;
   static const double e4 = -41478.;
   //
-  ierr = DIFF_ps_t_Na(t, ps, dpsdt, d2psdt2);
-  ierr = DIFF_qc_t_Na(t,
-                      ps,
-                      dpsdt,
-                      d2psdt2,
-                      x1,
-                      dx1dt,
-                      d2x1dt2,
-                      x2,
-                      dx2dt,
-                      d2x2dt2,
-                      x4,
-                      dx4dt,
-                      d2x4dt2,
-                      abar,
-                      dabardt,
-                      d2abardt2,
-                      bd,
-                      dbddt,
-                      d2bddt2,
-                      b2,
-                      db2dt,
-                      d2b2dt2,
-                      b4,
-                      db4dt,
-                      d2b4dt2);
+  DIFF_ps_t_Na(t, ps, dpsdt, d2psdt2);
+  DIFF_qc_t_Na(t,
+               ps,
+               dpsdt,
+               d2psdt2,
+               x1,
+               dx1dt,
+               d2x1dt2,
+               x2,
+               dx2dt,
+               d2x2dt2,
+               x4,
+               dx4dt,
+               d2x4dt2,
+               abar,
+               dabardt,
+               d2abardt2,
+               bd,
+               dbddt,
+               d2bddt2,
+               b2,
+               db2dt,
+               d2b2dt2,
+               b4,
+               db4dt,
+               d2b4dt2);
   //
   dhf1 = a + t * (b + t * (c + t * d));
   ddhf1dt = b + t * (2. * c + t * 3. * d);
@@ -1075,26 +1039,22 @@ DIFF_dhv_t_Na(double t, double & dhv, double & ddhvdt, double & d2dhvdt2)
       ((d2numdt2 * abar + dnumdt * dabardt - dnumdt * dabardt - num * d2abardt2) * (abar * abar) -
        (dnumdt * abar - num * dabardt) * 2. * abar * dabardt) /
       (abar * abar * abar * abar);
-  return 0;
 }
 //
-int
+void
 DIFF_h2_t_Na(double t, double & h2, double & dh2dt, double & d2h2dt2)
 { // units: R, Btu/lb
   double h1, dh1dt, d2h1dt2, dhv, ddhvdt, d2dhvdt2;
-  int ierr;
   //
-  ierr = DIFF_h1_t_Na(t, h1, dh1dt, d2h1dt2);
-  ierr = DIFF_dhv_t_Na(t, dhv, ddhvdt, d2dhvdt2);
+  DIFF_h1_t_Na(t, h1, dh1dt, d2h1dt2);
+  DIFF_dhv_t_Na(t, dhv, ddhvdt, d2dhvdt2);
   //
   h2 = h1 + dhv;
   dh2dt = dh1dt + ddhvdt;
   d2h2dt2 = d2h1dt2 + d2dhvdt2;
-  //
-  return 0;
 }
 //
-int
+void
 DIFF_vu_tp_G_Na(double t,
                 double p,
                 double & vv,
@@ -1123,10 +1083,9 @@ DIFF_vu_tp_G_Na(double t,
   duvdp = dhdp - (vv + p * dvvdp) * atmft3_toBtu;
   d2uvdp2 = d2hdp2 - (dvvdp + dvvdp + p * d2vvdp2) * atmft3_toBtu;
   d2uvdtdp = d2hdtdp - (dvvdt + p * d2vvdtdp) * atmft3_toBtu;
-  return 0;
 }
 //
-int
+void
 DIFF_h_tp_G_Na(double t,
                double p,
                double & hv,
@@ -1147,89 +1106,88 @@ DIFF_h_tp_G_Na(double t,
       d2bdhdtdp, b2h, db2hdt, d2b2hdt2, db2hdp, d2b2hdp2, d2b2hdtdp, b4h, db4hdt, d2b4hdt2, db4hdp,
       d2b4hdp2, d2b4hdtdp;
   double hvi, dhvidt, d2hvidt2;
-  int ierr;
   //
   static const double chv1 = 716.54;
   static const double chv2 = 811.85;
   //
-  ierr = DIFF_h1_t_Na(t, h1, dh1dt, d2h1dt2);
-  ierr = DIFF_dhv_t_Na(t, dhv, ddhvdt, d2dhvdt2);
+  DIFF_h1_t_Na(t, h1, dh1dt, d2h1dt2);
+  DIFF_dhv_t_Na(t, dhv, ddhvdt, d2dhvdt2);
   //
   h2 = h1 + dhv;
   dh2dt = dh1dt + ddhvdt;
   d2h2dt2 = d2h1dt2 + d2dhvdt2;
   //
-  ierr = DIFF_ps_t_Na(t, ps, dpsdt, d2psdt2);
-  ierr = DIFF_qc_t_Na(t,
-                      ps,
-                      dpsdt,
-                      d2psdt2,
-                      x1,
-                      dx1dt,
-                      d2x1dt2,
-                      x2,
-                      dx2dt,
-                      d2x2dt2,
-                      x4,
-                      dx4dt,
-                      d2x4dt2,
-                      abar,
-                      dabardt,
-                      d2abardt2,
-                      bd,
-                      dbddt,
-                      d2bddt2,
-                      b2,
-                      db2dt,
-                      d2b2dt2,
-                      b4,
-                      db4dt,
-                      d2b4dt2);
+  DIFF_ps_t_Na(t, ps, dpsdt, d2psdt2);
+  DIFF_qc_t_Na(t,
+               ps,
+               dpsdt,
+               d2psdt2,
+               x1,
+               dx1dt,
+               d2x1dt2,
+               x2,
+               dx2dt,
+               d2x2dt2,
+               x4,
+               dx4dt,
+               d2x4dt2,
+               abar,
+               dabardt,
+               d2abardt2,
+               bd,
+               dbddt,
+               d2bddt2,
+               b2,
+               db2dt,
+               d2b2dt2,
+               b4,
+               db4dt,
+               d2b4dt2);
   //
-  ierr = DIFF_qc_tp_Na(t,
-                       p,
-                       x1h,
-                       dx1hdt,
-                       d2x1hdt2,
-                       dx1hdp,
-                       d2x1hdp2,
-                       d2x1hdtdp,
-                       x2h,
-                       dx2hdt,
-                       d2x2hdt2,
-                       dx2hdp,
-                       d2x2hdp2,
-                       d2x2hdtdp,
-                       x4h,
-                       dx4hdt,
-                       d2x4hdt2,
-                       dx4hdp,
-                       d2x4hdp2,
-                       d2x4hdtdp,
-                       abarh,
-                       dabarhdt,
-                       d2abarhdt2,
-                       dabarhdp,
-                       d2abarhdp2,
-                       d2abarhdtdp,
-                       bdh,
-                       dbdhdt,
-                       d2bdhdt2,
-                       dbdhdp,
-                       d2bdhdp2,
-                       d2bdhdtdp,
-                       b2h,
-                       db2hdt,
-                       d2b2hdt2,
-                       db2hdp,
-                       d2b2hdp2,
-                       d2b2hdtdp,
-                       b4h,
-                       db4hdt,
-                       d2b4hdt2,
-                       db4hdp,
-                       d2b4hdp2,
-                       d2b4hdtdp);
+  DIFF_qc_tp_Na(t,
+                p,
+                x1h,
+                dx1hdt,
+                d2x1hdt2,
+                dx1hdp,
+                d2x1hdp2,
+                d2x1hdtdp,
+                x2h,
+                dx2hdt,
+                d2x2hdt2,
+                dx2hdp,
+                d2x2hdp2,
+                d2x2hdtdp,
+                x4h,
+                dx4hdt,
+                d2x4hdt2,
+                dx4hdp,
+                d2x4hdp2,
+                d2x4hdtdp,
+                abarh,
+                dabarhdt,
+                d2abarhdt2,
+                dabarhdp,
+                d2abarhdp2,
+                d2abarhdtdp,
+                bdh,
+                dbdhdt,
+                d2bdhdt2,
+                dbdhdp,
+                d2bdhdp2,
+                d2bdhdtdp,
+                b2h,
+                db2hdt,
+                d2b2hdt2,
+                db2hdp,
+                d2b2hdp2,
+                d2b2hdtdp,
+                b4h,
+                db4hdt,
+                d2b4hdt2,
+                db4hdp,
+                d2b4hdp2,
+                d2b4hdtdp);
   //
   hvi = h2 + b2 * chv1 + b4 * chv2;
   dhvidt = dh2dt + db2dt * chv1 + db4dt * chv2;
@@ -1240,27 +1198,22 @@ DIFF_h_tp_G_Na(double t,
   dhvdp = -db2hdp * chv1 - db4hdp * chv2;
   d2hvdp2 = -d2b2hdp2 * chv1 - d2b4hdp2 * chv2;
   d2hvdtdp = -d2b2hdtdp * chv1 - d2b4hdtdp * chv2;
-  //
-  return 0;
 }
 //
-int
+void
 DIFF_s2_t_Na(double t, double & s2, double & ds2dt, double & d2s2dt2)
 { // units: R, Btu/(lb*F)
   double s1, ds1dt, d2s1dt2, dhv, ddhvdt, d2dhvdt2;
-  int ierr;
   //
-  ierr = DIFF_s1_t_Na(t, s1, ds1dt, d2s1dt2);
-  ierr = DIFF_dhv_t_Na(t, dhv, ddhvdt, d2dhvdt2);
+  DIFF_s1_t_Na(t, s1, ds1dt, d2s1dt2);
+  DIFF_dhv_t_Na(t, dhv, ddhvdt, d2dhvdt2);
   //
   s2 = s1 + (dhv / t);
   ds2dt = ds1dt + (ddhvdt * t - dhv) / (t * t);
   d2s2dt2 = d2s1dt2 + (d2dhvdt2 * t * t - (ddhvdt * t - dhv) * 2.0) / (t * t * t);
-  //
-  return 0;
 }
 //
-int
+void
 DIFF_s_tp_G_Na(double t,
                double p,
                double & sv,
@@ -1295,7 +1248,6 @@ DIFF_s_tp_G_Na(double t,
   double term6, dterm6dt, d2term6dt2, dterm6dp, d2term6dp2, d2term6dtdp;
   //
   double svi, dsvidt, d2svidt2;
-  int ierr;
   //
   static const double chv1 = 716.54;
   static const double chv2 = 811.85;
@@ -1308,84 +1260,84 @@ DIFF_s_tp_G_Na(double t,
   static const double csv7 = 74697.5;
   static const double csv8 = 1.987180;
   //
-  ierr = DIFF_s1_t_Na(t, s1, ds1dt, d2s1dt2);
-  ierr = DIFF_dhv_t_Na(t, dhv, ddhvdt, d2dhvdt2);
+  DIFF_s1_t_Na(t, s1, ds1dt, d2s1dt2);
+  DIFF_dhv_t_Na(t, dhv, ddhvdt, d2dhvdt2);
   //
   s2 = s1 + (dhv / t);
   ds2dt = ds1dt + (ddhvdt * t - dhv) / (t * t);
   d2s2dt2 = d2s1dt2 + (d2dhvdt2 * t * t - (ddhvdt * t - dhv) * 2.0) / (t * t * t);
   //
-  ierr = DIFF_ps_t_Na(t, ps, dpsdt, d2psdt2);
-  ierr = DIFF_qc_t_Na(t,
-                      ps,
-                      dpsdt,
-                      d2psdt2,
-                      x1,
-                      dx1dt,
-                      d2x1dt2,
-                      x2,
-                      dx2dt,
-                      d2x2dt2,
-                      x4,
-                      dx4dt,
-                      d2x4dt2,
-                      abar,
-                      dabardt,
-                      d2abardt2,
-                      bd,
-                      dbddt,
-                      d2bddt2,
-                      b2,
-                      db2dt,
-                      d2b2dt2,
-                      b4,
-                      db4dt,
-                      d2b4dt2);
+  DIFF_ps_t_Na(t, ps, dpsdt, d2psdt2);
+  DIFF_qc_t_Na(t,
+               ps,
+               dpsdt,
+               d2psdt2,
+               x1,
+               dx1dt,
+               d2x1dt2,
+               x2,
+               dx2dt,
+               d2x2dt2,
+               x4,
+               dx4dt,
+               d2x4dt2,
+               abar,
+               dabardt,
+               d2abardt2,
+               bd,
+               dbddt,
+               d2bddt2,
+               b2,
+               db2dt,
+               d2b2dt2,
+               b4,
+               db4dt,
+               d2b4dt2);
   //
-  ierr = DIFF_qc_tp_Na(t,
-                       p,
-                       x1h,
-                       dx1hdt,
-                       d2x1hdt2,
-                       dx1hdp,
-                       d2x1hdp2,
-                       d2x1hdtdp,
-                       x2h,
-                       dx2hdt,
-                       d2x2hdt2,
-                       dx2hdp,
-                       d2x2hdp2,
-                       d2x2hdtdp,
-                       x4h,
-                       dx4hdt,
-                       d2x4hdt2,
-                       dx4hdp,
-                       d2x4hdp2,
-                       d2x4hdtdp,
-                       abarh,
-                       dabarhdt,
-                       d2abarhdt2,
-                       dabarhdp,
-                       d2abarhdp2,
-                       d2abarhdtdp,
-                       bdh,
-                       dbdhdt,
-                       d2bdhdt2,
-                       dbdhdp,
-                       d2bdhdp2,
-                       d2bdhdtdp,
-                       b2h,
-                       db2hdt,
-                       d2b2hdt2,
-                       db2hdp,
-                       d2b2hdp2,
-                       d2b2hdtdp,
-                       b4h,
-                       db4hdt,
-                       d2b4hdt2,
-                       db4hdp,
-                       d2b4hdp2,
-                       d2b4hdtdp);
+  DIFF_qc_tp_Na(t,
+                p,
+                x1h,
+                dx1hdt,
+                d2x1hdt2,
+                dx1hdp,
+                d2x1hdp2,
+                d2x1hdtdp,
+                x2h,
+                dx2hdt,
+                d2x2hdt2,
+                dx2hdp,
+                d2x2hdp2,
+                d2x2hdtdp,
+                x4h,
+                dx4hdt,
+                d2x4hdt2,
+                dx4hdp,
+                d2x4hdp2,
+                d2x4hdtdp,
+                abarh,
+                dabarhdt,
+                d2abarhdt2,
+                dabarhdp,
+                d2abarhdp2,
+                d2abarhdtdp,
+                bdh,
+                dbdhdt,
+                d2bdhdt2,
+                dbdhdp,
+                d2bdhdp2,
+                d2bdhdtdp,
+                b2h,
+                db2hdt,
+                d2b2hdt2,
+                db2hdp,
+                d2b2hdp2,
+                d2b2hdtdp,
+                b4h,
+                db4hdt,
+                d2b4hdt2,
+                db4hdp,
+                d2b4hdp2,
+                d2b4hdtdp);
   //
   double log_ps = log(ps);
   double log_p = log(p);
@@ -1551,8 +1503,6 @@ DIFF_s_tp_G_Na(double t,
   dsvdp = -dterm1dp - dterm2dp - dterm3dp + dterm4dp + dterm5dp - dterm6dp;
   d2svdp2 = -d2term1dp2 - d2term2dp2 - d2term3dp2 + d2term4dp2 + d2term5dp2 - d2term6dp2;
   d2svdtdp = -d2term1dtdp - d2term2dtdp - d2term3dtdp + d2term4dtdp + d2term5dtdp - d2term6dtdp;
-  //
-  return 0;
 }
 //
 //-----------------------------------------------------------------------------
@@ -1724,12 +1674,12 @@ DERIV_prho_L_Na(double t, double p, double & du_dp_rho, double & du_drho_p)
 
   double v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
-  double u, dudt, dudp;
+  double dudt, dudp;
   double dp_dv_u, dp_du_v;
 
   DIFF_v_tp_L_Na(t, p, v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
   DIFF_h_tp_L_Na(t, p, h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-  u = h - p * v * atmft3_toBtu;
+  // u = h - p * v * atmft3_toBtu;
   dudt = dhdt - p * dvdt * atmft3_toBtu;
   dudp = dhdp - (v + p * dvdp) * atmft3_toBtu;
 
@@ -1775,12 +1725,12 @@ DERIV_prho_G_Na(double t, double p, double & du_dp_rho, double & du_drho_p)
 
   double v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
-  double u, dudt, dudp;
+  double dudt, dudp;
   double dp_dv_u, dp_du_v;
 
   DIFF_v_tp_G_Na(t, p, v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
   DIFF_h_tp_G_Na(t, p, h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-  u = h - p * v * atmft3_toBtu;
+  // u = h - p * v * atmft3_toBtu;
   dudt = dhdt - p * dvdt * atmft3_toBtu;
   dudp = dhdp - (v + p * dvdp) * atmft3_toBtu;
 
@@ -1944,11 +1894,11 @@ DERIV_vu_L_Na(
 
   double vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
-  double ul, dudt, dudp;
+  double dudt, dudp;
 
   DIFF_v_tp_L_Na(t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
   DIFF_h_tp_L_Na(t, p, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-  ul = hl - p * vl * atmft3_toBtu;
+  // ul = hl - p * vl * atmft3_toBtu;
   dudt = dhdt - p * dvdt * atmft3_toBtu;
   dudp = dhdp - (vl + p * dvdp) * atmft3_toBtu;
 
@@ -2007,11 +1957,11 @@ DERIV_vu_G_Na(
 
   double vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
-  double uv, dudt, dudp;
+  double dudt, dudp;
 
   DIFF_v_tp_G_Na(t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
   DIFF_h_tp_G_Na(t, p, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-  uv = hv - p * vv * atmft3_toBtu;
+  // uv = hv - p * vv * atmft3_toBtu;
   dudt = dhdt - p * dvdt * atmft3_toBtu;
   dudp = dhdp - (vv + p * dvdp) * atmft3_toBtu;
 
@@ -2223,7 +2173,7 @@ sigma_t_Na(double t, double & sigma, double & dsigmadt, double & d2sigmadt2)
 //
 void
 etal_t_Na(double t, double & etal, double & detaldt, double & d2etaldt2)
-{ //R, lbm/ft-hr
+{ // R, lbm/ft-hr
   double log10_t, dlog10_tdt, d2log10_tdt2, log10_eta, dlog10_etadt, d2log10_etadt2, ln_eta,
       dln_etadt, d2ln_etadt2;
   static const double ln_10 = 2.3025850929940459;
@@ -2248,7 +2198,7 @@ etal_t_Na(double t, double & etal, double & detaldt, double & d2etaldt2)
 //
 void
 etav_t_Na(double t, double & etav, double & detavdt, double & d2etavdt2)
-{ //R, lbm/ft-hr
+{ // R, lbm/ft-hr
   double tF;
   static const double tR_tF = -459.7; // Rankine to Fahrenheit
   static const double a = 0.0190;
@@ -2264,7 +2214,7 @@ etav_t_Na(double t, double & etav, double & detavdt, double & d2etavdt2)
 //
 void
 lambdal_t_Na(double t, double & lambdal, double & dlambdaldt, double & d2lambdaldt2)
-{ //R, Btu/hr-ft-F
+{ // R, Btu/hr-ft-F
   double tF;
   static const double tR_tF = -459.7; // Rankine to Fahrenheit
   static const double a = 54.306;
@@ -2280,7 +2230,7 @@ lambdal_t_Na(double t, double & lambdal, double & dlambdaldt, double & d2lambdal
 //
 void
 lambdav_t_Na(double t, double & lambdav, double & dlambdavdt, double & d2lambdavdt2)
-{ //R, Btu/hr-ft-F
+{ // R, Btu/hr-ft-F
   double tF;
   static const double tR_tF = -459.7; // Rankine to Fahrenheit
   static const double a = 0.1639e-2;
