@@ -6,7 +6,7 @@ Renderer:
     type: MooseDocs.base.MaterializeRenderer
     name: sodium
     repo: https://hpcgitlab.inl.gov/idaholab/sodium
-    home: https://hpcsc.inl.gov/ssl/sodium/site/
+    home: https://hpcsc.inl.gov/ssl/SODIUM/site/
     navigation:
         Developers:
             Workflow: workflow.md
