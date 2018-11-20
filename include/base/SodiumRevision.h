@@ -3,7 +3,7 @@
 #ifndef SODIUM_REVISION_H
 #define SODIUM_REVISION_H
 
-#define SODIUM_REVISION "git commit 8cc8cec on 2018-11-19"
-#define SODIUM_VERSION "8cc8cec"
+#define SODIUM_REVISION "git commit 31947c7 on 2018-11-19"
+#define SODIUM_VERSION "31947c7"
 
 #endif // SODIUM_REVISION_H
