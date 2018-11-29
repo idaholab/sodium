@@ -69,8 +69,8 @@ traceout*.txt
 .depend
 .clang_complete
 .failed_tests
-include/base/Iapws95Revision.h
-include/Iapws95Revision.h
+include/base/SodiumRevision.h
+include/SodiumRevision.h
 build
 
 # Allow output files in gold directories
@@ -104,8 +104,8 @@ yaml_dump*
 
 # Unit testing stuff
 moose_unit/test_results.xml
-unit/include/Iapws95-unitRevision.h
-include/base/IapwsRevision.h
+unit/include/sodium-unitRevision.h
+include/base/sodiumRevision.h
 
 # gcov code coverage files
 *.gcno
@@ -113,7 +113,7 @@ include/base/IapwsRevision.h
 *.gcov
 doc/coverage/html/*
 doc/coverage/all.info
-doc/coverage/iapws95.info
+doc/coverage/sodium.info
 
 # paraview state files
 *.pvsm
