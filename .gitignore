@@ -104,8 +104,8 @@ yaml_dump*
 
 # Unit testing stuff
 moose_unit/test_results.xml
-unit/include/sodium-unitRevision.h
-include/base/sodiumRevision.h
+unit/include/Sodium-unitRevision.h
+include/base/SodiumRevision.h
 
 # gcov code coverage files
 *.gcno
