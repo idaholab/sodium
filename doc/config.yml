@@ -12,9 +12,9 @@ Renderer:
 Extensions:
     MooseDocs.extensions.navigation:
         menu:
-          Developers:
-              Workflow: workflow.md
-              Build Status: https://moosebuild.inl.gov/repo/idaholab/sodium
+            Developers:
+                Workflow: workflow.md
+                Build Status: https://moosebuild.inl.gov/repo/idaholab/sodium
     MooseDocs.extensions.appsyntax:
         executable: ${ROOT_DIR}
         hide:
