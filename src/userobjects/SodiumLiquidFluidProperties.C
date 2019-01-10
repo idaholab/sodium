@@ -1,5 +1,5 @@
 #include "SodiumLiquidFluidProperties.h"
-#include "Na_Golden.h"
+#include "contrib/libSodium/Na_Golden.h"
 
 registerMooseObject("SodiumApp", SodiumLiquidFluidProperties);
 
