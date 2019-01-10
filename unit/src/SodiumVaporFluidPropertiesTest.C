@@ -1,11 +1,10 @@
 #include "SodiumVaporFluidPropertiesTest.h"
 #include "SinglePhaseFluidPropertiesTestUtils.h"
-#include "common.h"
 
 TEST_F(SodiumVaporFluidPropertiesTest, test)
 {
   const Real T = 1500.;
-  const Real p =p_sat(T);
+  const Real p = 1101124.69860416;
 
   const Real rho_from_p_T = _fp->rho_from_p_T(p, T);
   const Real rho = rho_from_p_T;

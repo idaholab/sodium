@@ -553,3 +553,11 @@ SodiumLiquidFluidProperties::criticalDensity() const
 {
   return 219.;
 }
+
+Real
+SodiumLiquidFluidProperties::sigma_from_p_T(Real, Real T) const
+{
+  double sigma, dsigmadt, d2sigmadt2;
+  sigma_t_Na(T, sigma, dsigmadt, d2sigmadt2);
+  return sigma * 1e-3;
+}

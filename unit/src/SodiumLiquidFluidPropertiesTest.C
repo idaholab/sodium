@@ -1,11 +1,10 @@
 #include "SodiumLiquidFluidPropertiesTest.h"
 #include "SinglePhaseFluidPropertiesTestUtils.h"
-#include "common.h"
 
 TEST_F(SodiumLiquidFluidPropertiesTest, test)
 {
   const Real T = 1500.;
-  const Real p =p_sat(T);
+  const Real p = 1101124.69860416;
 
   const Real rho_from_p_T = _fp->rho_from_p_T(p, T);
   const Real rho = rho_from_p_T;
@@ -78,5 +77,5 @@ TEST_F(SodiumLiquidFluidPropertiesTest, test)
   DERIV_TEST(_fp->h_from_p_T, p, T, REL_TOL_DERIVATIVE);
 
   // sigma
-  REL_TEST(sigma(T), 0.085924584655757016, REL_TOL_SAVED_VALUE);
+  REL_TEST(_fp->sigma_from_p_T(p, T), 0.085924584655757016, REL_TOL_SAVED_VALUE);
 }
