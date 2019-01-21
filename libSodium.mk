@@ -10,7 +10,7 @@ LIBSODIUM_objects   := $(patsubst %.cpp, %.$(obj-suffix), $(LIBSODIUM_srcfiles))
 LIBSODIUM_deps      := $(patsubst %.$(obj-suffix), %.$(obj-suffix).d, $(LIBSODIUM_objects))
 LIBSODIUM_LIB       := $(LIBSODIUM_DIR)/libSodium-$(METHOD).la
 
-app_INCLUDES += -I$(LIBSODIUM_DIR)
+app_INCLUDES += -I$(SODIUM_DIR)
 app_LIBS += $(LIBSODIUM_LIB)
 
 $(LIBSODIUM_LIB): $(LIBSODIUM_objects)
