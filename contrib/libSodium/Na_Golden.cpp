@@ -1878,7 +1878,9 @@ FLASH_vu_L_Na(double v, double u, double & t, double & p)
     den = ddvdp * ddudt - ddvdt * ddudp;
     t -= (du * ddvdp - dv * ddudp) / den;
     p -= (dv * ddudt - du * ddvdt) / den;
-    if (++it > 20)
+    if (p < 1.e-5)
+      p = 1.e-5;
+    if (++it > 50)
     {
       return -1;
     }
@@ -1941,7 +1943,9 @@ FLASH_vu_G_Na(double v, double u, double & t, double & p)
     den = ddvdp * ddudt - ddvdt * ddudp;
     t -= (du * ddvdp - dv * ddudp) / den;
     p -= (dv * ddudt - du * ddvdt) / den;
-    if (++it > 20)
+    if (p < 1.e-5)
+      p = 1.e-5;
+    if (++it > 50)
     {
       return -1;
     }
@@ -2001,7 +2005,9 @@ FLASH_vh_L_Na(double v, double h, double & t, double & p)
     den = ddvdp * ddhdt - ddvdt * ddhdp;
     t -= (dh * ddvdp - dv * ddhdp) / den;
     p -= (dv * ddhdt - dh * ddvdt) / den;
-    if (++it > 20)
+    if (p < 1.e-5)
+      p = 1.e-5;
+    if (++it > 50)
     {
       return -1;
     }
@@ -2055,7 +2061,9 @@ FLASH_vh_G_Na(double v, double h, double & t, double & p)
     den = ddvdp * ddhdt - ddvdt * ddhdp;
     t -= (dh * ddvdp - dv * ddhdp) / den;
     p -= (dv * ddhdt - dh * ddvdt) / den;
-    if (++it > 20)
+    if (p < 1.e-5)
+      p = 1.e-5;
+    if (++it > 50)
     {
       return -1;
     }
@@ -2109,7 +2117,9 @@ FLASH_hs_L_Na(double h, double s, double & t, double & p)
     den = ddsdp * ddhdt - ddsdt * ddhdp;
     t -= (dh * ddsdp - ds * ddhdp) / den;
     p -= (ds * ddhdt - dh * ddsdt) / den;
-    if (++it > 20)
+    if (p < 1.e-5)
+      p = 1.e-5;
+    if (++it > 50)
     {
       return -1;
     }
@@ -2147,7 +2157,9 @@ FLASH_hs_G_Na(double h, double s, double & t, double & p)
     den = ddsdp * ddhdt - ddsdt * ddhdp;
     t -= (dh * ddsdp - ds * ddhdp) / den;
     p -= (ds * ddhdt - dh * ddsdt) / den;
-    if (++it > 20)
+    if (p < 1.e-5)
+      p = 1.e-5;
+    if (++it > 50)
     {
       return -1;
     }
