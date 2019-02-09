@@ -50,6 +50,7 @@ TEST_F(SodiumLiquidFluidPropertiesTest, test)
   // cp
   const Real cp = _fp->cp_from_v_e(v, e);
   REL_TEST(cp, 1417.2885128554665, REL_TOL_SAVED_VALUE);
+  DERIV_TEST(_fp->cp_from_v_e, v, e, 0.001); // allow 0.1% here (numerical derivative)
 
   // cv
   const Real cv = _fp->cv_from_v_e(v, e);
@@ -78,4 +79,9 @@ TEST_F(SodiumLiquidFluidPropertiesTest, test)
 
   // sigma
   REL_TEST(_fp->sigma_from_p_T(p, T), 0.085924584655757016, REL_TOL_SAVED_VALUE);
+
+  // beta
+  const Real beta = _fp->beta_from_p_T(p, T);
+  REL_TEST(beta, 0.0003698434199095453, REL_TOL_SAVED_VALUE);
+  DERIV_TEST(_fp->beta_from_p_T, p, T, REL_TOL_DERIVATIVE);
 }
