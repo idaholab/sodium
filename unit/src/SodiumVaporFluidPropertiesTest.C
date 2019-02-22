@@ -59,6 +59,7 @@ TEST_F(SodiumVaporFluidPropertiesTest, test)
   // mu
   const Real mu = _fp->mu_from_v_e(v, e);
   REL_TEST(mu, 0.000020942543653754892, REL_TOL_SAVED_VALUE);
+  REL_TEST(_fp->mu_from_p_T(p, T), 0.000020942543653754892, REL_TOL_SAVED_VALUE);
 
   // k
   const Real k = _fp->k_from_v_e(v, e);
