@@ -102,6 +102,8 @@ DIFF_ts_p_Na(double p, double & ts, double & dtsdp, double & d2tsdp2)
   double ps, dpsdt, d2psdt2;
 
   static const double tol_p = 1.e-6;
+  static const double tmin = 250. * 9. / 5.;
+  static const double tmax = 3000. * 9. / 5.;
   static const double tnb = 1154.7 * 9. / 5.;
   // initial guess from normal boiling point in R
   ts = tnb;
@@ -113,6 +115,14 @@ DIFF_ts_p_Na(double p, double & ts, double & dtsdp, double & d2tsdp2)
     DIFF_ps_t_Na(ts, ps, dpsdt, d2psdt2);
     dp = ps - p;
     ts -= dp / dpsdt;
+    if (ts < tmin)
+    {
+      ts = tmin;
+    }
+    else if (ts > tmax)
+    {
+      ts = tmax;
+    }
     if (++it > 20)
     {
       return -1;
@@ -1643,6 +1653,8 @@ int
 FLASH_prho_L_Na(double p, double rho, double & t)
 {
   static const double tol_v = 1.e-6;
+  static const double tmin = 250. * 9. / 5.;
+  static const double tmax = 3000. * 9. / 5.;
 
   double ts, dtsdp, d2tsdp2;
   double vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
@@ -1653,12 +1665,20 @@ FLASH_prho_L_Na(double p, double rho, double & t)
   double v = 1. / rho;
 
   int it = 0;
-  double dv = 1.;
+  double dv = 1.e12;
   while (fabs(dv) / v > tol_v)
   {
     DIFF_v_tp_L_Na(t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
     dv = vl - v;
     t -= dv / dvdt;
+    if (t < tmin)
+    {
+      t = tmin;
+    }
+    else if (t > tmax)
+    {
+      t = tmax;
+    }
     if (++it > 20)
     {
       return -1;
@@ -1694,6 +1714,8 @@ int
 FLASH_prho_G_Na(double p, double rho, double & t)
 {
   static const double tol_v = 1.e-6;
+  static const double tmin = 250. * 9. / 5.;
+  static const double tmax = 3000. * 9. / 5.;
 
   double ts, dtsdp, d2tsdp2;
   double vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
@@ -1704,12 +1726,20 @@ FLASH_prho_G_Na(double p, double rho, double & t)
   double v = 1. / rho;
 
   int it = 0;
-  double dv = 1.;
+  double dv = 1.e12;
   while (fabs(dv) / v > tol_v)
   {
     DIFF_v_tp_G_Na(t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
     dv = vl - v;
     t -= dv / dvdt;
+    if (t < tmin)
+    {
+      t = tmin;
+    }
+    else if (t > tmax)
+    {
+      t = tmax;
+    }
     if (++it > 20)
     {
       return -1;
@@ -1745,6 +1775,8 @@ int
 FLASH_ph_L_Na(double p, double h, double & t)
 {
   static const double tol_h = 1.e-6;
+  static const double tmin = 250. * 9. / 5.;
+  static const double tmax = 3000. * 9. / 5.;
 
   double ts, dtsdp, d2tsdp2;
   double hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
@@ -1753,12 +1785,20 @@ FLASH_ph_L_Na(double p, double h, double & t)
   t = ts;
 
   int it = 0;
-  double dh = 1.;
+  double dh = 1.e12;
   while (fabs(dh) > tol_h)
   {
     DIFF_h_tp_L_Na(t, p, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
     dh = hl - h;
     t -= dh / dhdt;
+    if (t < tmin)
+    {
+      t = tmin;
+    }
+    else if (t > tmax)
+    {
+      t = tmax;
+    }
     if (++it > 20)
     {
       return -1;
@@ -1771,6 +1811,8 @@ int
 FLASH_ph_G_Na(double p, double h, double & t)
 {
   static const double tol_h = 1.e-6;
+  static const double tmin = 250. * 9. / 5.;
+  static const double tmax = 3000. * 9. / 5.;
 
   double ts, dtsdp, d2tsdp2;
   double hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
@@ -1779,12 +1821,20 @@ FLASH_ph_G_Na(double p, double h, double & t)
   t = ts;
 
   int it = 0;
-  double dh = 1.;
+  double dh = 1.e12;
   while (fabs(dh) > tol_h)
   {
     DIFF_h_tp_G_Na(t, p, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
     dh = hv - h;
     t -= dh / dhdt;
+    if (t < tmin)
+    {
+      t = tmin;
+    }
+    else if (t > tmax)
+    {
+      t = tmax;
+    }
     if (++it > 20)
     {
       return -1;
@@ -1797,6 +1847,8 @@ int
 FLASH_ps_L_Na(double p, double s, double & t)
 {
   static const double tol_s = 1.e-8;
+  static const double tmin = 250. * 9. / 5.;
+  static const double tmax = 3000. * 9. / 5.;
 
   double ts, dtsdp, d2tsdp2;
   double sl, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
@@ -1805,12 +1857,20 @@ FLASH_ps_L_Na(double p, double s, double & t)
   t = ts;
 
   int it = 0;
-  double ds = 1.;
+  double ds = 1.e12;
   while (fabs(ds) > tol_s)
   {
     DIFF_s_tp_L_Na(t, p, sl, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
     ds = sl - s;
     t -= ds / dsdt;
+    if (t < tmin)
+    {
+      t = tmin;
+    }
+    else if (t > tmax)
+    {
+      t = tmax;
+    }
     if (++it > 20)
     {
       return -1;
@@ -1823,6 +1883,8 @@ int
 FLASH_ps_G_Na(double p, double s, double & t)
 {
   static const double tol_s = 1.e-8;
+  static const double tmin = 250. * 9. / 5.;
+  static const double tmax = 3000. * 9. / 5.;
 
   double ts, dtsdp, d2tsdp2;
   double sv, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
@@ -1831,12 +1893,20 @@ FLASH_ps_G_Na(double p, double s, double & t)
   t = ts;
 
   int it = 0;
-  double ds = 1.;
+  double ds = 1.e12;
   while (fabs(ds) > tol_s)
   {
     DIFF_s_tp_G_Na(t, p, sv, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
     ds = sv - s;
     t -= ds / dsdt;
+    if (t < tmin)
+    {
+      t = tmin;
+    }
+    else if (t > tmax)
+    {
+      t = tmax;
+    }
     if (++it > 20)
     {
       return -1;
@@ -1850,6 +1920,9 @@ FLASH_vu_L_Na(double v, double u, double & t, double & p)
 {
   static const double tol_v = 1.e-6;
   static const double tol_u = 1.e-6;
+  static const double tmin = 250. * 9. / 5.;
+  static const double tmax = 3000. * 9. / 5.;
+  static const double pmin = 1.e-20;
   static const double atmft3_toBtu = (101325. * 0.3048 * 0.3048 * 0.3048) / 1055.05585262;
 
   double vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
@@ -1862,7 +1935,7 @@ FLASH_vu_L_Na(double v, double u, double & t, double & p)
   p = 1.;
 
   int it = 0;
-  double dv = 1., du = 1.;
+  double dv = 1.e12, du = 1.e12;
   double ddudt, ddudp, ddvdt, ddvdp, den;
   while (fabs(dv) / v > tol_v || fabs(du) > tol_u)
   {
@@ -1878,8 +1951,16 @@ FLASH_vu_L_Na(double v, double u, double & t, double & p)
     den = ddvdp * ddudt - ddvdt * ddudp;
     t -= (du * ddvdp - dv * ddudp) / den;
     p -= (dv * ddudt - du * ddvdt) / den;
-    if (p < 1.e-5)
-      p = 1.e-5;
+    if (t < tmin)
+    {
+      t = tmin;
+    }
+    else if (t > tmax)
+    {
+      t = tmax;
+    }
+    if (p < pmin)
+      p = pmin;
     if (++it > 50)
     {
       return -1;
@@ -1915,6 +1996,9 @@ FLASH_vu_G_Na(double v, double u, double & t, double & p)
 {
   static const double tol_v = 1.e-6;
   static const double tol_u = 1.e-6;
+  static const double tmin = 250. * 9. / 5.;
+  static const double tmax = 3000. * 9. / 5.;
+  static const double pmin = 1.e-20;
   static const double atmft3_toBtu = (101325. * 0.3048 * 0.3048 * 0.3048) / 1055.05585262;
 
   double vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
@@ -1927,7 +2011,7 @@ FLASH_vu_G_Na(double v, double u, double & t, double & p)
   p = 1.;
 
   int it = 0;
-  double dv = 1., du = 1.;
+  double dv = 1.e12, du = 1.e12;
   double ddudt, ddudp, ddvdt, ddvdp, den;
   while (fabs(dv) / v > tol_v || fabs(du) > tol_u)
   {
@@ -1943,8 +2027,16 @@ FLASH_vu_G_Na(double v, double u, double & t, double & p)
     den = ddvdp * ddudt - ddvdt * ddudp;
     t -= (du * ddvdp - dv * ddudp) / den;
     p -= (dv * ddudt - du * ddvdt) / den;
-    if (p < 1.e-5)
-      p = 1.e-5;
+    if (t < tmin)
+    {
+      t = tmin;
+    }
+    else if (t > tmax)
+    {
+      t = tmax;
+    }
+    if (p < pmin)
+      p = pmin;
     if (++it > 50)
     {
       return -1;
@@ -1980,6 +2072,9 @@ FLASH_vh_L_Na(double v, double h, double & t, double & p)
 {
   static const double tol_v = 1.e-6;
   static const double tol_h = 1.e-6;
+  static const double tmin = 250. * 9. / 5.;
+  static const double tmax = 3000. * 9. / 5.;
+  static const double pmin = 1.e-20;
 
   double vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
@@ -1990,7 +2085,7 @@ FLASH_vh_L_Na(double v, double h, double & t, double & p)
   p = 1.;
 
   int it = 0;
-  double dv = 1., dh = 1.;
+  double dv = 1.e12, dh = 1.e12;
   double ddhdt, ddhdp, ddvdt, ddvdp, den;
   while (fabs(dv) / v > tol_v || fabs(dh) > tol_h)
   {
@@ -2005,8 +2100,16 @@ FLASH_vh_L_Na(double v, double h, double & t, double & p)
     den = ddvdp * ddhdt - ddvdt * ddhdp;
     t -= (dh * ddvdp - dv * ddhdp) / den;
     p -= (dv * ddhdt - dh * ddvdt) / den;
-    if (p < 1.e-5)
-      p = 1.e-5;
+    if (t < tmin)
+    {
+      t = tmin;
+    }
+    else if (t > tmax)
+    {
+      t = tmax;
+    }
+    if (p < pmin)
+      p = pmin;
     if (++it > 50)
     {
       return -1;
@@ -2036,6 +2139,9 @@ FLASH_vh_G_Na(double v, double h, double & t, double & p)
 {
   static const double tol_v = 1.e-6;
   static const double tol_h = 1.e-6;
+  static const double tmin = 250. * 9. / 5.;
+  static const double tmax = 3000. * 9. / 5.;
+  static const double pmin = 1.e-20;
 
   double vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
@@ -2046,7 +2152,7 @@ FLASH_vh_G_Na(double v, double h, double & t, double & p)
   p = 1.;
 
   int it = 0;
-  double dv = 1., dh = 1.;
+  double dv = 1.e12, dh = 1.e12;
   double ddhdt, ddhdp, ddvdt, ddvdp, den;
   while (fabs(dv) / v > tol_v || fabs(dh) > tol_h)
   {
@@ -2061,8 +2167,16 @@ FLASH_vh_G_Na(double v, double h, double & t, double & p)
     den = ddvdp * ddhdt - ddvdt * ddhdp;
     t -= (dh * ddvdp - dv * ddhdp) / den;
     p -= (dv * ddhdt - dh * ddvdt) / den;
-    if (p < 1.e-5)
-      p = 1.e-5;
+    if (t < tmin)
+    {
+      t = tmin;
+    }
+    else if (t > tmax)
+    {
+      t = tmax;
+    }
+    if (p < pmin)
+      p = pmin;
     if (++it > 50)
     {
       return -1;
@@ -2092,6 +2206,9 @@ FLASH_hs_L_Na(double h, double s, double & t, double & p)
 {
   static const double tol_h = 1.e-6;
   static const double tol_s = 1.e-8;
+  static const double tmin = 250. * 9. / 5.;
+  static const double tmax = 3000. * 9. / 5.;
+  static const double pmin = 1.e-20;
 
   double hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
   double sl, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
@@ -2102,7 +2219,7 @@ FLASH_hs_L_Na(double h, double s, double & t, double & p)
   p = 1.;
 
   int it = 0;
-  double dh = 1., ds = 1.;
+  double dh = 1.e12, ds = 1.e12;
   double ddhdt, ddhdp, ddsdt, ddsdp, den;
   while (fabs(dh) > tol_h || fabs(ds) > tol_s)
   {
@@ -2117,8 +2234,16 @@ FLASH_hs_L_Na(double h, double s, double & t, double & p)
     den = ddsdp * ddhdt - ddsdt * ddhdp;
     t -= (dh * ddsdp - ds * ddhdp) / den;
     p -= (ds * ddhdt - dh * ddsdt) / den;
-    if (p < 1.e-5)
-      p = 1.e-5;
+    if (t < tmin)
+    {
+      t = tmin;
+    }
+    else if (t > tmax)
+    {
+      t = tmax;
+    }
+    if (p < pmin)
+      p = pmin;
     if (++it > 50)
     {
       return -1;
@@ -2132,6 +2257,9 @@ FLASH_hs_G_Na(double h, double s, double & t, double & p)
 {
   static const double tol_h = 1.e-6;
   static const double tol_s = 1.e-8;
+  static const double tmin = 250. * 9. / 5.;
+  static const double tmax = 3000. * 9. / 5.;
+  static const double pmin = 1.e-20;
 
   double hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
   double sv, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
@@ -2142,7 +2270,7 @@ FLASH_hs_G_Na(double h, double s, double & t, double & p)
   p = 1.;
 
   int it = 0;
-  double dh = 1., ds = 1.;
+  double dh = 1.e12, ds = 1.e12;
   double ddhdt, ddhdp, ddsdt, ddsdp, den;
   while (fabs(dh) > tol_h || fabs(ds) > tol_s)
   {
@@ -2157,8 +2285,16 @@ FLASH_hs_G_Na(double h, double s, double & t, double & p)
     den = ddsdp * ddhdt - ddsdt * ddhdp;
     t -= (dh * ddsdp - ds * ddhdp) / den;
     p -= (ds * ddhdt - dh * ddsdt) / den;
-    if (p < 1.e-5)
-      p = 1.e-5;
+    if (t < tmin)
+    {
+      t = tmin;
+    }
+    else if (t > tmax)
+    {
+      t = tmax;
+    }
+    if (p < pmin)
+      p = pmin;
     if (++it > 50)
     {
       return -1;
