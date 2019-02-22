@@ -198,6 +198,22 @@ SodiumLiquidFluidProperties::mu_from_v_e(Real v, Real e) const
 }
 
 Real
+SodiumLiquidFluidProperties::mu_from_p_T(Real p, Real T) const
+{
+  p *= _to_atm;
+  T *= _to_R;
+
+  double v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
+  double eta, detadt, d2etadt2;
+
+  DIFF_v_tp_L_Na(T, p, v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+
+  etal_t_Na(T, eta, detadt, d2etadt2); // eta in lbm/ft-hr
+
+  return eta * _to_kg / (_to_s * _to_m);
+}
+
+Real
 SodiumLiquidFluidProperties::k_from_v_e(Real v, Real e) const
 {
   v *= _to_ft3_lb;
