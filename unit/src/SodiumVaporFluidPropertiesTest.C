@@ -87,3 +87,16 @@ TEST_F(SodiumVaporFluidPropertiesTest, test)
   REL_TEST(_fp->criticalTemperature(), 2503.7, REL_TOL_SAVED_VALUE);
   REL_TEST(_fp->criticalDensity(), 219., REL_TOL_SAVED_VALUE);
 }
+
+TEST_F(SodiumVaporFluidPropertiesTest, test_bs)
+{
+  const Real T = 806;
+  const Real p = 1e3;
+
+  const Real rho = _fp->rho_from_p_T(p, T);
+  const Real e = _fp->e_from_p_rho(p, rho);
+  const Real v = 1 / rho;
+
+  REL_TEST(_fp->p_from_v_e(v, e), p, REL_TOL_SAVED_VALUE);
+  REL_TEST(_fp->T_from_v_e(v, e), T, REL_TOL_SAVED_VALUE);
+}
