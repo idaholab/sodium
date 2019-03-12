@@ -47,9 +47,15 @@ SodiumLiquidFluidProperties::p_from_v_e(Real v, Real e) const
   e *= _to_Btu_lb;
 
   double p, T;
-  FLASH_vu_L_Na(v, e, T, p);
-
-  return p * _to_Pa;
+  int ierr = FLASH_vu_L_Na(v, e, T, p);
+  if (ierr != 0)
+  {
+    return getNaN();
+  }
+  else
+  {
+    return p * _to_Pa;
+  }
 }
 
 void
@@ -60,12 +66,21 @@ SodiumLiquidFluidProperties::p_from_v_e(Real v, Real e, Real & p, Real & dp_dv, 
 
   double T;
   double dp_dv_u, dp_du_v, dt_dv_u, dt_du_v;
-  FLASH_vu_L_Na(v, e, T, p);
-  DERIV_vu_L_Na(T, p, dp_dv_u, dp_du_v, dt_dv_u, dt_du_v);
+  int ierr = FLASH_vu_L_Na(v, e, T, p);
+  if (ierr != 0)
+  {
+    p = getNaN();
+    dp_dv = getNaN();
+    dp_de = getNaN();
+  }
+  else
+  {
+    DERIV_vu_L_Na(T, p, dp_dv_u, dp_du_v, dt_dv_u, dt_du_v);
 
-  p *= _to_Pa;
-  dp_dv = dp_dv_u * _to_Pa / _to_m3_kg;
-  dp_de = dp_du_v * _to_Pa / _to_J_kg;
+    p *= _to_Pa;
+    dp_dv = dp_dv_u * _to_Pa / _to_m3_kg;
+    dp_de = dp_du_v * _to_Pa / _to_J_kg;
+  }
 }
 
 Real
@@ -75,9 +90,15 @@ SodiumLiquidFluidProperties::T_from_v_e(Real v, Real e) const
   e *= _to_Btu_lb;
 
   double p, T;
-  FLASH_vu_L_Na(v, e, T, p);
-
-  return T * _to_K;
+  int ierr = FLASH_vu_L_Na(v, e, T, p);
+  if (ierr != 0)
+  {
+    return getNaN();
+  }
+  else
+  {
+    return T * _to_K;
+  }
 }
 
 void
@@ -88,12 +109,21 @@ SodiumLiquidFluidProperties::T_from_v_e(Real v, Real e, Real & T, Real & dT_dv, 
 
   double p;
   double dp_dv_u, dp_du_v, dt_dv_u, dt_du_v;
-  FLASH_vu_L_Na(v, e, T, p);
-  DERIV_vu_L_Na(T, p, dp_dv_u, dp_du_v, dt_dv_u, dt_du_v);
+  int ierr = FLASH_vu_L_Na(v, e, T, p);
+  if (ierr != 0)
+  {
+    T = getNaN();
+    dT_dv = getNaN();
+    dT_de = getNaN();
+  }
+  else
+  {
+    DERIV_vu_L_Na(T, p, dp_dv_u, dp_du_v, dt_dv_u, dt_du_v);
 
-  T *= _to_K;
-  dT_dv = dt_dv_u * _to_K / _to_m3_kg;
-  dT_de = dt_du_v * _to_K / _to_J_kg;
+    T *= _to_K;
+    dT_dv = dt_dv_u * _to_K / _to_m3_kg;
+    dT_de = dt_du_v * _to_K / _to_J_kg;
+  }
 }
 
 Real
@@ -104,10 +134,17 @@ SodiumLiquidFluidProperties::c_from_v_e(Real v, Real e) const
 
   double p, T;
   double w, dwdt, dwdp;
-  FLASH_vu_L_Na(v, e, T, p);
-  DIFF_w_tp_L_Na(T, p, w, dwdt, dwdp);
+  int ierr = FLASH_vu_L_Na(v, e, T, p);
+  if (ierr != 0)
+  {
+    return getNaN();
+  }
+  else
+  {
+    DIFF_w_tp_L_Na(T, p, w, dwdt, dwdp);
 
-  return w * _to_m;
+    return w * _to_m;
+  }
 }
 
 void
@@ -120,14 +157,23 @@ SodiumLiquidFluidProperties::c_from_v_e(Real v, Real e, Real & c, Real & dc_dv, 
   double w, dwdt, dwdp;
   double v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double u_, dudt, d2udt2, dudp, d2udp2, d2udtdp;
-  FLASH_vu_L_Na(v, e, T, p);
-  DIFF_vu_tp_L_Na(
-      T, p, v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, u_, dudt, d2udt2, dudp, d2udp2, d2udtdp);
-  DIFF_w_tp_L_Na(T, p, w, dwdt, dwdp);
+  int ierr = FLASH_vu_L_Na(v, e, T, p);
+  if (ierr != 0)
+  {
+    c = getNaN();
+    dc_dv = getNaN();
+    dc_de = getNaN();
+  }
+  else
+  {
+    DIFF_vu_tp_L_Na(
+        T, p, v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, u_, dudt, d2udt2, dudp, d2udp2, d2udtdp);
+    DIFF_w_tp_L_Na(T, p, w, dwdt, dwdp);
 
-  c = w * _to_m;
-  dc_dv = (dwdt * dudp - dwdp * dudt) / (dvdt * dudp - dvdp * dudt) * _to_m / _to_m3_kg;
-  dc_de = (dwdt * dvdp - dwdp * dvdt) / (dudt * dvdp - dudp * dvdt) * _to_m / _to_J_kg;
+    c = w * _to_m;
+    dc_dv = (dwdt * dudp - dwdp * dudt) / (dvdt * dudp - dvdp * dudt) * _to_m / _to_m3_kg;
+    dc_de = (dwdt * dvdp - dwdp * dvdt) / (dudt * dvdp - dudp * dvdt) * _to_m / _to_J_kg;
+  }
 }
 
 Real
@@ -138,33 +184,50 @@ SodiumLiquidFluidProperties::cp_from_v_e(Real v, Real e) const
 
   double p, T;
   double cp, dcpdt, dcpdp;
-  FLASH_vu_L_Na(v, e, T, p);
+  int ierr = FLASH_vu_L_Na(v, e, T, p);
+  if (ierr != 0)
+  {
+    return getNaN();
+  }
+  else
+  {
+    DIFF_cp_tp_L_Na(T, p, cp, dcpdt, dcpdp);
 
-  DIFF_cp_tp_L_Na(T, p, cp, dcpdt, dcpdp);
-
-  return cp * _to_J_kgK;
+    return cp * _to_J_kgK;
+  }
 }
 
 void
 SodiumLiquidFluidProperties::cp_from_v_e(
     Real v, Real e, Real & cp, Real & dcp_dv, Real & dcp_de) const
 {
-  double dv = 1e-4 * v;
-  static const double de = 1e-3;
-  double cp1, cp2;
+  v *= _to_ft3_lb;
+  e *= _to_Btu_lb;
 
-  cp = cp_from_v_e(v, e);
+  double p, T;
+  double dcpdt, dcpdp;
+  double v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
+  double u_, dudt, d2udt2, dudp, d2udp2, d2udtdp;
+  int ierr = FLASH_vu_L_Na(v, e, T, p);
+  if (ierr != 0)
+  {
+    cp = getNaN();
+    dcp_dv = getNaN();
+    dcp_de = getNaN();
+  }
+  else
+  {
+    DIFF_cp_tp_L_Na(T, p, cp, dcpdt, dcpdp);
+    DIFF_vu_tp_L_Na(
+        T, p, v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, u_, dudt, d2udt2, dudp, d2udp2, d2udtdp);
 
-  // Centered numerical derivatives are used here.
-  // cp is a first order derivative of the second order spline polynomials
-  // already.
-  cp1 = cp_from_v_e(v - dv, e);
-  cp2 = cp_from_v_e(v + dv, e);
-  dcp_dv = (cp2 - cp1) / (2. * dv);
+    dcp_dv = (dcpdt * dudp - dcpdp * dudt) / (dvdt * dudp - dvdp * dudt);
+    dcp_de = (dcpdt * dvdp - dcpdp * dvdt) / (dudt * dvdp - dudp * dvdt);
 
-  cp1 = cp_from_v_e(v, e - de);
-  cp2 = cp_from_v_e(v, e + de);
-  dcp_de = (cp2 - cp1) / (2. * de);
+    cp *= _to_J_kgK;
+    dcp_dv *= _to_J_kgK / _to_m3_kg;
+    dcp_de *= _to_J_kgK / _to_J_kg;
+  }
 }
 
 Real
@@ -175,11 +238,17 @@ SodiumLiquidFluidProperties::cv_from_v_e(Real v, Real e) const
 
   double p, T;
   double cv, dcvdt, dcvdp;
-  FLASH_vu_L_Na(v, e, T, p);
+  int ierr = FLASH_vu_L_Na(v, e, T, p);
+  if (ierr != 0)
+  {
+    return getNaN();
+  }
+  else
+  {
+    DIFF_cv_tp_L_Na(T, p, cv, dcvdt, dcvdp);
 
-  DIFF_cv_tp_L_Na(T, p, cv, dcvdt, dcvdp);
-
-  return cv * _to_J_kgK;
+    return cv * _to_J_kgK;
+  }
 }
 
 Real
@@ -190,11 +259,17 @@ SodiumLiquidFluidProperties::mu_from_v_e(Real v, Real e) const
 
   double p, T;
   double eta, detadt, d2etadt2;
-  FLASH_vu_L_Na(v, e, T, p);
+  int ierr = FLASH_vu_L_Na(v, e, T, p);
+  if (ierr != 0)
+  {
+    return getNaN();
+  }
+  else
+  {
+    etal_t_Na(T, eta, detadt, d2etadt2); // eta in lbm/ft-hr
 
-  etal_t_Na(T, eta, detadt, d2etadt2); // eta in lbm/ft-hr
-
-  return eta * _to_kg / (_to_s * _to_m);
+    return eta * _to_kg / (_to_s * _to_m);
+  }
 }
 
 Real
@@ -221,11 +296,17 @@ SodiumLiquidFluidProperties::k_from_v_e(Real v, Real e) const
 
   double p, T;
   double lambda, dlambdadt, d2lambdadt2;
-  FLASH_vu_L_Na(v, e, T, p);
+  int ierr = FLASH_vu_L_Na(v, e, T, p);
+  if (ierr != 0)
+  {
+    return getNaN();
+  }
+  else
+  {
+    lambdal_t_Na(T, lambda, dlambdadt, d2lambdadt2); // lambda in Btu/hr-ft-F
 
-  lambdal_t_Na(T, lambda, dlambdadt, d2lambdadt2); // lambda in Btu/hr-ft-F
-
-  return lambda * _to_J / (_to_s * _to_m * _to_K);
+    return lambda * _to_J / (_to_s * _to_m * _to_K);
+  }
 }
 
 Real
@@ -236,11 +317,17 @@ SodiumLiquidFluidProperties::s_from_v_e(Real v, Real e) const
 
   double p, T;
   double s, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
-  FLASH_vu_L_Na(v, e, T, p);
+  int ierr = FLASH_vu_L_Na(v, e, T, p);
+  if (ierr != 0)
+  {
+    return getNaN();
+  }
+  else
+  {
+    DIFF_s_tp_L_Na(T, p, s, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
 
-  DIFF_s_tp_L_Na(T, p, s, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
-
-  return s * _to_J_kgK;
+    return s * _to_J_kgK;
+  }
 }
 
 void
@@ -253,18 +340,26 @@ SodiumLiquidFluidProperties::s_from_v_e(Real v, Real e, Real & s, Real & ds_dv, 
   double dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
   double v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double u_, dudt, d2udt2, dudp, d2udp2, d2udtdp;
-  FLASH_vu_L_Na(v, e, T, p);
+  int ierr = FLASH_vu_L_Na(v, e, T, p);
+  if (ierr != 0)
+  {
+    s = getNaN();
+    ds_dv = getNaN();
+    ds_de = getNaN();
+  }
+  else
+  {
+    DIFF_s_tp_L_Na(T, p, s, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
+    DIFF_vu_tp_L_Na(
+        T, p, v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, u_, dudt, d2udt2, dudp, d2udp2, d2udtdp);
 
-  DIFF_s_tp_L_Na(T, p, s, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
-  DIFF_vu_tp_L_Na(
-      T, p, v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, u_, dudt, d2udt2, dudp, d2udp2, d2udtdp);
+    ds_dv = (dsdt * dudp - dsdp * dudt) / (dvdt * dudp - dvdp * dudt);
+    ds_de = (dsdt * dvdp - dsdp * dvdt) / (dudt * dvdp - dudp * dvdt);
 
-  ds_dv = (dsdt * dudp - dsdp * dudt) / (dvdt * dudp - dvdp * dudt);
-  ds_de = (dsdt * dvdp - dsdp * dvdt) / (dudt * dvdp - dudp * dvdt);
-
-  s *= _to_J_kgK;
-  ds_dv *= _to_J_kgK / _to_m3_kg;
-  ds_de *= _to_J_kgK / _to_J_kg;
+    s *= _to_J_kgK;
+    ds_dv *= _to_J_kgK / _to_m3_kg;
+    ds_de *= _to_J_kgK / _to_J_kg;
+  }
 }
 
 Real
@@ -276,10 +371,17 @@ SodiumLiquidFluidProperties::s_from_h_p(Real h, Real p) const
   double T;
   double s, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
 
-  FLASH_ph_L_Na(p, h, T);
-  DIFF_s_tp_L_Na(T, p, s, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
+  int ierr = FLASH_ph_L_Na(p, h, T);
+  if (ierr != 0)
+  {
+    return getNaN();
+  }
+  else
+  {
+    DIFF_s_tp_L_Na(T, p, s, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
 
-  return s * _to_J_kgK;
+    return s * _to_J_kgK;
+  }
 }
 
 void
@@ -292,13 +394,22 @@ SodiumLiquidFluidProperties::s_from_h_p(Real h, Real p, Real & s, Real & ds_dh, 
   double dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
   double h_, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
 
-  FLASH_ph_L_Na(p, h, T);
-  DIFF_s_tp_L_Na(T, p, s, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
-  DIFF_h_tp_L_Na(T, p, h_, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+  int ierr = FLASH_ph_L_Na(p, h, T);
+  if (ierr != 0)
+  {
+    s = getNaN();
+    ds_dp = getNaN();
+    ds_dh = getNaN();
+  }
+  else
+  {
+    DIFF_s_tp_L_Na(T, p, s, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
+    DIFF_h_tp_L_Na(T, p, h_, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
 
-  s *= _to_J_kgK;
-  ds_dp = (dsdp - dsdt * dhdp / dhdt) * _to_J_kgK / _to_Pa;
-  ds_dh = dsdt / dhdt * _to_J_kgK / _to_J_kg;
+    s *= _to_J_kgK;
+    ds_dp = (dsdp - dsdt * dhdp / dhdt) * _to_J_kgK / _to_Pa;
+    ds_dh = dsdt / dhdt * _to_J_kgK / _to_J_kg;
+  }
 }
 
 Real
@@ -310,10 +421,17 @@ SodiumLiquidFluidProperties::rho_from_p_s(Real p, Real s) const
   double T;
   double v, dvdt, d2vdt2, dvdp, d2vdp2, d2vvdtdp;
 
-  FLASH_ps_L_Na(p, s, T);
-  DIFF_v_tp_L_Na(T, p, v, dvdt, d2vdt2, dvdp, d2vdp2, d2vvdtdp);
+  int ierr = FLASH_ps_L_Na(p, s, T);
+  if (ierr != 0)
+  {
+    return getNaN();
+  }
+  else
+  {
+    DIFF_v_tp_L_Na(T, p, v, dvdt, d2vdt2, dvdp, d2vdp2, d2vvdtdp);
 
-  return 1. / (v * _to_m3_kg);
+    return 1. / (v * _to_m3_kg);
+  }
 }
 
 void
@@ -328,21 +446,30 @@ SodiumLiquidFluidProperties::rho_from_p_s(
   double s_, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
   double dv_dp_s, dv_ds_p;
 
-  FLASH_ps_L_Na(p, s, T);
-  DIFF_v_tp_L_Na(T, p, v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
-  DIFF_s_tp_L_Na(T, p, s_, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
+  int ierr = FLASH_ps_L_Na(p, s, T);
+  if (ierr != 0)
+  {
+    rho = getNaN();
+    drho_dp = getNaN();
+    drho_ds = getNaN();
+  }
+  else
+  {
+    DIFF_v_tp_L_Na(T, p, v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+    DIFF_s_tp_L_Na(T, p, s_, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
 
-  dv_dp_s = dvdp - dvdt * dsdp / dsdt;
-  dv_ds_p = dvdt / dsdt;
+    dv_dp_s = dvdp - dvdt * dsdp / dsdt;
+    dv_ds_p = dvdt / dsdt;
 
-  v *= _to_m3_kg;
-  dv_dp_s *= (_to_m3_kg / _to_Pa);
-  dv_ds_p *= (_to_m3_kg / _to_J_kgK);
+    v *= _to_m3_kg;
+    dv_dp_s *= (_to_m3_kg / _to_Pa);
+    dv_ds_p *= (_to_m3_kg / _to_J_kgK);
 
-  rho = 1. / v;
-  double drho_dv = -rho * rho;
-  drho_dp = drho_dv * dv_dp_s;
-  drho_ds = drho_dv * dv_ds_p;
+    rho = 1. / v;
+    double drho_dv = -rho * rho;
+    drho_dp = drho_dv * dv_dp_s;
+    drho_ds = drho_dv * dv_ds_p;
+  }
 }
 
 Real
@@ -357,14 +484,20 @@ SodiumLiquidFluidProperties::e_from_v_h(Real v, Real h) const
   double v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double h_, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
   double u;
-  FLASH_vh_L_Na(v, h, T, p);
+  int ierr = FLASH_vh_L_Na(v, h, T, p);
+  if (ierr != 0)
+  {
+    return getNaN();
+  }
+  else
+  {
+    DIFF_v_tp_L_Na(T, p, v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+    DIFF_h_tp_L_Na(T, p, h_, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
 
-  DIFF_v_tp_L_Na(T, p, v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
-  DIFF_h_tp_L_Na(T, p, h_, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+    u = h - p * v * atmft3_toBtu;
 
-  u = h - p * v * atmft3_toBtu;
-
-  return u * _to_J_kg;
+    return u * _to_J_kg;
+  }
 }
 
 void
@@ -379,18 +512,26 @@ SodiumLiquidFluidProperties::e_from_v_h(Real v, Real h, Real & e, Real & de_dv, 
   double v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double h_, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
   double u, dudt, dudp;
-  FLASH_vh_L_Na(v, h, T, p);
+  int ierr = FLASH_vh_L_Na(v, h, T, p);
+  if (ierr != 0)
+  {
+    e = getNaN();
+    de_dv = getNaN();
+    de_dh = getNaN();
+  }
+  else
+  {
+    DIFF_v_tp_L_Na(T, p, v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+    DIFF_h_tp_L_Na(T, p, h_, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
 
-  DIFF_v_tp_L_Na(T, p, v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
-  DIFF_h_tp_L_Na(T, p, h_, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+    u = h - p * v * atmft3_toBtu;
+    dudt = dhdt - p * dvdt * atmft3_toBtu;
+    dudp = dhdp - (v + p * dvdp) * atmft3_toBtu;
 
-  u = h - p * v * atmft3_toBtu;
-  dudt = dhdt - p * dvdt * atmft3_toBtu;
-  dudp = dhdp - (v + p * dvdp) * atmft3_toBtu;
-
-  e = u * _to_J_kg;
-  de_dv = (dudt * dhdp - dudp * dhdt) / (dvdt * dhdp - dvdp * dhdt) * _to_J_kg / _to_m3_kg;
-  de_dh = (dudt * dvdp - dudp * dvdt) / (dhdt * dvdp - dhdp * dvdt);
+    e = u * _to_J_kg;
+    de_dv = (dudt * dhdp - dudp * dhdt) / (dvdt * dhdp - dvdp * dhdt) * _to_J_kg / _to_m3_kg;
+    de_dh = (dudt * dvdp - dudp * dvdt) / (dhdt * dvdp - dhdp * dvdt);
+  }
 }
 
 Real
@@ -440,13 +581,20 @@ SodiumLiquidFluidProperties::e_from_p_rho(Real p, Real rho) const
   double v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
   double u;
-  FLASH_prho_L_Na(p, rho, T);
-  DIFF_v_tp_L_Na(T, p, v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
-  DIFF_h_tp_L_Na(T, p, h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+  int ierr = FLASH_prho_L_Na(p, rho, T);
+  if (ierr != 0)
+  {
+    return getNaN();
+  }
+  else
+  {
+    DIFF_v_tp_L_Na(T, p, v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+    DIFF_h_tp_L_Na(T, p, h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
 
-  u = h - p * v * atmft3_toBtu;
+    u = h - p * v * atmft3_toBtu;
 
-  return u * _to_J_kg;
+    return u * _to_J_kg;
+  }
 }
 
 void
@@ -464,21 +612,30 @@ SodiumLiquidFluidProperties::e_from_p_rho(
   double h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
   double u, dudt, dudp;
   double de_dv;
-  FLASH_prho_L_Na(p, rho, T);
-  DIFF_v_tp_L_Na(T, p, v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
-  DIFF_h_tp_L_Na(T, p, h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+  int ierr = FLASH_prho_L_Na(p, rho, T);
+  if (ierr != 0)
+  {
+    e = getNaN();
+    de_dp = getNaN();
+    de_drho = getNaN();
+  }
+  else
+  {
+    DIFF_v_tp_L_Na(T, p, v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+    DIFF_h_tp_L_Na(T, p, h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
 
-  u = h - p * v * atmft3_toBtu;
-  dudt = dhdt - p * dvdt * atmft3_toBtu;
-  dudp = dhdp - (v + p * dvdp) * atmft3_toBtu;
+    u = h - p * v * atmft3_toBtu;
+    dudt = dhdt - p * dvdt * atmft3_toBtu;
+    dudp = dhdp - (v + p * dvdp) * atmft3_toBtu;
 
-  de_dp = dudp - dudt * dvdp / dvdt;
-  de_dv = dudt / dvdt;
-  de_drho = -de_dv * v * v;
+    de_dp = dudp - dudt * dvdp / dvdt;
+    de_dv = dudt / dvdt;
+    de_drho = -de_dv * v * v;
 
-  e = u * _to_J_kg;
-  de_dp *= _to_J_kg / _to_Pa;
-  de_drho *= _to_J_kg * _to_m3_kg;
+    e = u * _to_J_kg;
+    de_dp *= _to_J_kg / _to_Pa;
+    de_drho *= _to_J_kg * _to_m3_kg;
+  }
 }
 
 Real
@@ -514,9 +671,15 @@ SodiumLiquidFluidProperties::p_from_h_s(Real h, Real s) const
   s *= _to_Btu_lbR;
 
   double T, p;
-  FLASH_hs_L_Na(h, s, T, p);
-
-  return p * _to_Pa;
+  int ierr = FLASH_hs_L_Na(h, s, T, p);
+  if (ierr != 0)
+  {
+    return getNaN();
+  }
+  else
+  {
+    return p * _to_Pa;
+  }
 }
 
 void
@@ -528,16 +691,25 @@ SodiumLiquidFluidProperties::p_from_h_s(Real h, Real s, Real & p, Real & dp_dh, 
   double T;
   double h_, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
   double s_, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
-  FLASH_hs_L_Na(h, s, T, p);
-  DIFF_h_tp_L_Na(T, p, h_, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-  DIFF_s_tp_L_Na(T, p, s_, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
+  int ierr = FLASH_hs_L_Na(h, s, T, p);
+  if (ierr != 0)
+  {
+    p = getNaN();
+    dp_dh = getNaN();
+    dp_ds = getNaN();
+  }
+  else
+  {
+    DIFF_h_tp_L_Na(T, p, h_, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+    DIFF_s_tp_L_Na(T, p, s_, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
 
-  dp_dh = 1. / (dhdp - dhdt * dsdp / dsdt);
-  dp_ds = 1. / (dsdp - dsdt * dhdp / dhdt);
+    dp_dh = 1. / (dhdp - dhdt * dsdp / dsdt);
+    dp_ds = 1. / (dsdp - dsdt * dhdp / dhdt);
 
-  p *= _to_Pa;
-  dp_dh *= _to_Pa / _to_J_kg;
-  dp_ds *= _to_Pa / _to_J_kgK;
+    p *= _to_Pa;
+    dp_dh *= _to_Pa / _to_J_kg;
+    dp_ds *= _to_Pa / _to_J_kgK;
+  }
 }
 
 Real
@@ -553,15 +725,22 @@ SodiumLiquidFluidProperties::g_from_v_e(Real v, Real e) const
   double h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
   double s, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
 
-  FLASH_vu_L_Na(v, e, T, p);
-  DIFF_v_tp_L_Na(T, p, v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
-  DIFF_h_tp_L_Na(T, p, h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-  DIFF_s_tp_L_Na(T, p, s, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
+  int ierr = FLASH_vu_L_Na(v, e, T, p);
+  if (ierr != 0)
+  {
+    return getNaN();
+  }
+  else
+  {
+    DIFF_v_tp_L_Na(T, p, v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+    DIFF_h_tp_L_Na(T, p, h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+    DIFF_s_tp_L_Na(T, p, s, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
 
-  h = e + p * v * atmft3_toBtu;
-  g = h - T * s;
+    h = e + p * v * atmft3_toBtu;
+    g = h - T * s;
 
-  return g * _to_J_kg;
+    return g * _to_J_kg;
+  }
 }
 
 Real
@@ -576,22 +755,22 @@ void
 SodiumLiquidFluidProperties::beta_from_p_T(
     Real p, Real T, Real & beta, Real & dbeta_dp, Real & dbeta_dT) const
 {
-  double dp = 1e-6 * p;
-  static const double dT = 1e-6;
-  double beta1, beta2;
+  p *= _to_atm;
+  T *= _to_R;
 
-  beta = beta_from_p_T(p, T);
+  double v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
 
-  // Centered numerical derivatives are used here.
-  // beta is a first order derivative of the second order spline polynomials
-  // already.
-  beta1 = beta_from_p_T(p - dp, T);
-  beta2 = beta_from_p_T(p + dp, T);
-  dbeta_dp = (beta2 - beta1) / (2. * dp);
+  DIFF_v_tp_L_Na(T, p, v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
 
-  beta1 = beta_from_p_T(p, T - dT);
-  beta2 = beta_from_p_T(p, T + dT);
-  dbeta_dT = (beta2 - beta1) / (2. * dT);
+  v *= _to_m3_kg;
+  dvdt *= (_to_m3_kg / _to_K);
+  d2vdt2 *= (_to_m3_kg / (_to_K * _to_K));
+  dvdp *= (_to_m3_kg / _to_Pa);
+  d2vdtdp *= (_to_m3_kg / (_to_K * _to_Pa));
+
+  beta = dvdt / v;
+  dbeta_dT = (d2vdt2 * v - dvdt * dvdt) / (v * v);
+  dbeta_dp = (d2vdtdp * v - dvdt * dvdp) / (v * v);
 }
 
 // - molar mass depends on the presence of Na, Na2, and maybe even Na4 (monomer, dimer, tetramer)
