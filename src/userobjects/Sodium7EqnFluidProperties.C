@@ -1,8 +1,6 @@
 #include "Sodium7EqnFluidProperties.h"
 #include "SinglePhaseFluidProperties.h"
-
-void DIFF_ps_t_Na(double t, double & ps, double & dpsdt, double & d2psdt2);
-int DIFF_ts_p_Na(double p, double & ts, double & dtsdp, double & d2tsdp2);
+#include "contrib/libSodium/Na_Golden.h"
 
 const Real Sodium7EqnFluidProperties::_P_critical = 25.64E+6;
 
@@ -99,4 +97,20 @@ Sodium7EqnFluidProperties::dT_sat_dp(Real pressure) const
   }
   else
     return getNaN();
+}
+
+Real
+Sodium7EqnFluidProperties::sigma_from_T(Real T) const
+{
+  double sigma, dsigmadt, d2sigmadt2;
+  sigma_t_Na(T, sigma, dsigmadt, d2sigmadt2);
+  return sigma * 1e-3;
+}
+
+Real
+Sodium7EqnFluidProperties::dsigma_dT_from_T(Real T) const
+{
+  double sigma, dsigmadt, d2sigmadt2;
+  sigma_t_Na(T, sigma, dsigmadt, d2sigmadt2);
+  return dsigmadt * 1e-3;
 }
