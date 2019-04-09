@@ -78,9 +78,6 @@ TEST_F(SodiumLiquidFluidPropertiesTest, test)
   REL_TEST(h_from_p_T, 1960686.7352137996, REL_TOL_SAVED_VALUE);
   DERIV_TEST(_fp->h_from_p_T, p, T, REL_TOL_DERIVATIVE);
 
-  // sigma
-  REL_TEST(_fp->sigma_from_p_T(p, T), 0.085924584655757016, REL_TOL_SAVED_VALUE);
-
   // beta
   const Real beta = _fp->beta_from_p_T(p, T);
   REL_TEST(beta, 0.0003698434199095453, REL_TOL_SAVED_VALUE);
