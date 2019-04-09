@@ -2,7 +2,6 @@
 #define SODIUMLIQUIDFLUIDPROPERTIES_H
 
 #include "SinglePhaseFluidProperties.h"
-#include "LiquidFluidPropertiesInterface.h"
 #include "NaNInterface.h"
 
 class SodiumLiquidFluidProperties;
@@ -24,7 +23,6 @@ InputParameters validParams<SodiumLiquidFluidProperties>();
  * - conductivity:       Btu/(hr ft R)
  */
 class SodiumLiquidFluidProperties : public SinglePhaseFluidProperties,
-                                    public LiquidFluidPropertiesInterface,
                                     public NaNInterface
 {
 public:
@@ -68,8 +66,6 @@ public:
   // virtual Real molarMass() const override;
   virtual Real criticalTemperature() const override;
   virtual Real criticalDensity() const override;
-
-  virtual Real sigma_from_p_T(Real p, Real T) const override;
 
 protected:
   /// Conversion factor from m to ft
