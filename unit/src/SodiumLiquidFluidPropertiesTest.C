@@ -46,17 +46,17 @@ TEST_F(SodiumLiquidFluidPropertiesTest, test)
 
   // c
   const Real c = _fp->c_from_v_e(v, e);
-  REL_TEST(c, 1758.5592982054891, REL_TOL_SAVED_VALUE);
+  REL_TEST(c, 1786.31056403756, REL_TOL_SAVED_VALUE);
   DERIV_TEST(_fp->c_from_v_e, v, e, REL_TOL_DERIVATIVE);
 
   // cp
   const Real cp = _fp->cp_from_v_e(v, e);
-  REL_TEST(cp, 1417.2885128554665, REL_TOL_SAVED_VALUE);
+  REL_TEST(cp, 1417.2873380622611, REL_TOL_SAVED_VALUE);
   DERIV_TEST(_fp->cp_from_v_e, v, e, REL_TOL_DERIVATIVE);
 
   // cv
   const Real cv = _fp->cv_from_v_e(v, e);
-  REL_TEST(cv, 978.54515799090188, REL_TOL_SAVED_VALUE);
+  REL_TEST(cv, 969.12949833990774, REL_TOL_SAVED_VALUE);
 
   // mu
   const Real mu = _fp->mu_from_v_e(v, e);
@@ -82,6 +82,6 @@ TEST_F(SodiumLiquidFluidPropertiesTest, test)
 
   // beta
   const Real beta = _fp->beta_from_p_T(p, T);
-  REL_TEST(beta, 0.0003698434199095453, REL_TOL_SAVED_VALUE);
+  REL_TEST(beta, 0.0003697547833923901, REL_TOL_SAVED_VALUE);
   DERIV_TEST(_fp->beta_from_p_T, p, T, REL_TOL_DERIVATIVE);
 }

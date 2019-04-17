@@ -216,6 +216,3 @@ void lambdav_t_Na(double t,
                   double & lambdav,
                   double & dlambdavdt,
                   double & d2lambdavdt2); // R, Btu/hr-ft-F
-
-void
-betat_t_Na(double t, double & betat, double & dbetatdt, double & d2betatdt2, double & d3betatdt3);
