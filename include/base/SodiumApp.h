@@ -1,5 +1,4 @@
-#ifndef SODIUMAPP_H
-#define SODIUMAPP_H
+#pragma once
 
 #include "MooseApp.h"
 
@@ -20,5 +19,3 @@ public:
 
 protected:
 };
-
-#endif /* SODIUMAPP_H */

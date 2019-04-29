@@ -1,5 +1,4 @@
-#ifndef SODIUM7EQNFLUIDPROPERTIESTEST_H
-#define SODIUM7EQNFLUIDPROPERTIESTEST_H
+#pragma once
 
 #include "MooseObjectUnitTest.h"
 #include "Sodium7EqnFluidProperties.h"
@@ -19,5 +18,3 @@ protected:
 
   const Sodium7EqnFluidProperties * _fp;
 };
-
-#endif /* SODIUM7EQNFLUIDPROPERTIESTEST_H */

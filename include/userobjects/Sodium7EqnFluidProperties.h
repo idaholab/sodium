@@ -1,5 +1,4 @@
-#ifndef SODIUM7EQNFLUIDPROPERTIES_H
-#define SODIUM7EQNFLUIDPROPERTIES_H
+#pragma once
 
 #include "TwoPhaseFluidProperties.h"
 #include "NaNInterface.h"
@@ -40,5 +39,3 @@ protected:
   /// Conversion factor from R to K
   const Real _to_K;
 };
-
-#endif /* SODIUM7EQNFLUIDPROPERTIES_H */
