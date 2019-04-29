@@ -1,5 +1,4 @@
-#ifndef SODIUMLIQUIDFLUIDPROPERTIES_H
-#define SODIUMLIQUIDFLUIDPROPERTIES_H
+#pragma once
 
 #include "SinglePhaseFluidProperties.h"
 #include "NaNInterface.h"
@@ -111,5 +110,3 @@ protected:
   /// Conversion factor from Btu/(lb R) to J/(kg K)
   const Real _to_J_kgK;
 };
-
-#endif /* SODIUMLIQUIDFLUIDPROPERTIES_H */
