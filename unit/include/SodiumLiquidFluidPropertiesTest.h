@@ -1,5 +1,4 @@
-#ifndef SODIUMLIQUIDFLUIDPROPERTIESTEST_H
-#define SODIUMLIQUIDFLUIDPROPERTIESTEST_H
+#pragma once
 
 #include "MooseObjectUnitTest.h"
 #include "SodiumLiquidFluidProperties.h"
@@ -19,5 +18,3 @@ protected:
 
   const SodiumLiquidFluidProperties * _fp;
 };
-
-#endif /* SODIUMLIQUIDFLUIDPROPERTIESTEST_H */
