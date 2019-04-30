@@ -22,11 +22,12 @@ DIFF_ps_t_Na(double t, double & ps, double & dpsdt, double & d2psdt2)
   {
     double ps_1, dpsdt_1, d2psdt2_1, ps_2, dpsdt_2, d2psdt2_2;
     ps_1 = (a1 / sqrt(t)) * (exp(b1 / t));
-    dpsdt_1 = -ps * (b1 / (t * t) + 0.5 / t);
-    d2psdt2_1 = -dpsdt * (b1 / (t * t) + 0.5 / t) - ps * (-2. * b1 / (t * t * t) - 0.5 / (t * t));
+    dpsdt_1 = -ps_1 * (b1 / (t * t) + 0.5 / t);
+    d2psdt2_1 =
+        -dpsdt_1 * (b1 / (t * t) + 0.5 / t) - ps_1 * (-2. * b1 / (t * t * t) - 0.5 / (t * t));
     ps_2 = (a2 / pow(t, b2)) * exp(c2 / t);
-    dpsdt_2 = -ps * (c2 / (t * t) + b2 / t);
-    d2psdt2_2 = -dpsdt * (c2 / (t * t) + b2 / t) - ps * (-2. * c2 / (t * t * t) - b2 / (t * t));
+    dpsdt_2 = -ps_2 * (c2 / (t * t) + b2 / t);
+    d2psdt2_2 = -dpsdt_2 * (c2 / (t * t) + b2 / t) - ps_2 * (-2. * c2 / (t * t * t) - b2 / (t * t));
     ps = (ps_2 - ps_1) / dt * (t - dtrans) + ps_1;
     dpsdt = (dpsdt_2 - dpsdt_1) / dt * (t - dtrans) + (ps_2 - ps_1) / dt + dpsdt_1;
     d2psdt2 = (d2psdt2_2 - d2psdt2_1) / dt * (t - dtrans) + (dpsdt_2 - dpsdt_1) / dt +
@@ -65,19 +66,20 @@ DIFF_ps_t_Na(double t, double & ps, double & dpsdt, double & d2psdt2, double & d
   {
     double ps_1, dpsdt_1, d2psdt2_1, d3psdt3_1, ps_2, dpsdt_2, d2psdt2_2, d3psdt3_2;
     ps_1 = (a1 / sqrt(t)) * (exp(b1 / t));
-    dpsdt_1 = -ps * (b1 / (t * t) + 0.5 / t);
-    d2psdt2_1 = -dpsdt * (b1 / (t * t) + 0.5 / t) - ps * (-2. * b1 / (t * t * t) - 0.5 / (t * t));
-    d3psdt3_1 = -d2psdt2 * (b1 / (t * t) + 0.5 / t) -
-                dpsdt * (-2. * b1 / (t * t * t) - 0.5 / (t * t)) -
-                dpsdt * (-2. * b1 / (t * t * t) - 0.5 / (t * t)) -
-                ps * (6. * b1 / (t * t * t * t) + 1. / (t * t * t));
+    dpsdt_1 = -ps_1 * (b1 / (t * t) + 0.5 / t);
+    d2psdt2_1 =
+        -dpsdt_1 * (b1 / (t * t) + 0.5 / t) - ps_1 * (-2. * b1 / (t * t * t) - 0.5 / (t * t));
+    d3psdt3_1 = -d2psdt2_1 * (b1 / (t * t) + 0.5 / t) -
+                dpsdt_1 * (-2. * b1 / (t * t * t) - 0.5 / (t * t)) -
+                dpsdt_1 * (-2. * b1 / (t * t * t) - 0.5 / (t * t)) -
+                ps_1 * (6. * b1 / (t * t * t * t) + 1. / (t * t * t));
     ps_2 = (a2 / pow(t, b2)) * exp(c2 / t);
-    dpsdt_2 = -ps * (c2 / (t * t) + b2 / t);
-    d2psdt2_2 = -dpsdt * (c2 / (t * t) + b2 / t) - ps * (-2. * c2 / (t * t * t) - b2 / (t * t));
-    d3psdt3_2 = -d2psdt2 * (c2 / (t * t) + b2 / t) -
-                dpsdt * (-2. * c2 / (t * t * t) - b2 / (t * t)) -
-                dpsdt * (-2. * c2 / (t * t * t) - b2 / (t * t)) -
-                ps * (6. * c2 / (t * t * t * t) + 2. * b2 / (t * t * t));
+    dpsdt_2 = -ps_2 * (c2 / (t * t) + b2 / t);
+    d2psdt2_2 = -dpsdt_2 * (c2 / (t * t) + b2 / t) - ps_2 * (-2. * c2 / (t * t * t) - b2 / (t * t));
+    d3psdt3_2 = -d2psdt2_2 * (c2 / (t * t) + b2 / t) -
+                dpsdt_2 * (-2. * c2 / (t * t * t) - b2 / (t * t)) -
+                dpsdt_2 * (-2. * c2 / (t * t * t) - b2 / (t * t)) -
+                ps_2 * (6. * c2 / (t * t * t * t) + 2. * b2 / (t * t * t));
     ps = (ps_2 - ps_1) / dt * (t - dtrans) + ps_1;
     dpsdt = (dpsdt_2 - dpsdt_1) / dt * (t - dtrans) + (ps_2 - ps_1) / dt + dpsdt_1;
     d2psdt2 = (d2psdt2_2 - d2psdt2_1) / dt * (t - dtrans) + (dpsdt_2 - dpsdt_1) / dt +
