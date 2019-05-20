@@ -413,6 +413,50 @@ SodiumVaporFluidProperties::s_from_h_p(Real h, Real p, Real & s, Real & ds_dh, R
 }
 
 Real
+SodiumVaporFluidProperties::T_from_h_p(Real h, Real p) const
+{
+  p *= _to_atm;
+  h *= _to_Btu_lb;
+
+  double T;
+
+  int ierr = FLASH_ph_G_Na(p, h, T);
+  if (ierr != 0)
+  {
+    return getNaN();
+  }
+  else
+  {
+    return T * _to_K;
+  }
+}
+
+void
+SodiumVaporFluidProperties::T_from_h_p(Real h, Real p, Real & T, Real & dT_dh, Real & dT_dp) const
+{
+  p *= _to_atm;
+  h *= _to_Btu_lb;
+
+  double h_, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
+
+  int ierr = FLASH_ph_G_Na(p, h, T);
+  if (ierr != 0)
+  {
+    T = getNaN();
+    dT_dp = getNaN();
+    dT_dh = getNaN();
+  }
+  else
+  {
+    DIFF_h_tp_G_Na(T, p, h_, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+
+    T *= _to_K;
+    dT_dp = (-dhdp / dhdt) * _to_K / _to_Pa;
+    dT_dh = 1 / dhdt * _to_K / _to_J_kg;
+  }
+}
+
+Real
 SodiumVaporFluidProperties::rho_from_p_s(Real p, Real s) const
 {
   p *= _to_atm;
