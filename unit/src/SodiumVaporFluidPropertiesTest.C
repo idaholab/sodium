@@ -29,7 +29,8 @@ TEST_F(SodiumVaporFluidPropertiesTest, test)
   // T
   REL_TEST(_fp->T_from_v_e(v, e), T, REL_TOL_CONSISTENCY);
   DERIV_TEST(_fp->T_from_v_e, v, e, REL_TOL_DERIVATIVE);
-
+  REL_TEST(_fp->T_from_h_p(h, p), T, REL_TOL_CONSISTENCY);
+  DERIV_TEST(_fp->T_from_h_p, h, p, REL_TOL_DERIVATIVE);
   // rho and v
   REL_TEST(rho_from_p_T, 2.4435362681668855, REL_TOL_SAVED_VALUE);
   REL_TEST(_fp->rho_from_p_s(p, s), rho_from_p_T, REL_TOL_CONSISTENCY);
