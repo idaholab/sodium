@@ -1,9 +1,61 @@
 #include "math.h"
 #include "Na_Golden.h"
 //
+// directives for different formulations
+//#define GUPTA_PS // vapor pressure according to Gupta
+//#define GUPTA_D1 //saturated liquid density according to Gupta
+#define GUPTA_BETA_T // use Gupta's equation for beta_t(p,T)
+                     //(integrated to give higher accuracy for rho(t,p) and all derived properties)
+//
 void
 DIFF_ps_t_Na(double t, double & ps, double & dpsdt, double & d2psdt2)
 { // units: R, atm
+#ifdef GUPTA_PS
+  static const double dt = 10.;
+  static const double tR_to_tK = 5. / 9.;
+  static const double tK_to_tR = 9. / 5.;
+  static const double dtrans = 1155. * tK_to_tR;
+  double tK = t * tR_to_tK;
+  static const double a1 = 14.631003;
+  static const double b1 = -12818.491;
+  static const double c1 = -0.5;
+  static const double a2 = 12.4494904;
+  static const double b2 = -22029.9768;
+  static const double c2 = -0.242089052;
+
+  if (t < dtrans)
+  {
+    ps = exp(a1 + b1 / tK + c1 * log(tK));
+    dpsdt = ps * (-b1 / (tK * tK) + c1 / tK);
+    d2psdt2 =
+        dpsdt * (-b1 / (tK * tK) + c1 / tK) + ps * (+2. * b1 / (tK * tK * tK) - c1 / (tK * tK));
+    dpsdt *= tR_to_tK;
+    d2psdt2 *= (tR_to_tK * tR_to_tK);
+  }
+  else if (t < dtrans + dt)
+  {
+    double ps_1, dpsdt_1, d2psdt2_1, ps_2, dpsdt_2, d2psdt2_2;
+    ps_1 = exp(a1 + b1 / tK + c1 * log(tK));
+    dpsdt_1 = ps_1 * (-b1 / (tK * tK) + c1 / tK);
+    d2psdt2_1 =
+        dpsdt_1 * (-b1 / (tK * tK) + c1 / tK) + ps_1 * (+2. * b1 / (tK * tK * tK) - c1 / (tK * tK));
+    dpsdt_1 *= tR_to_tK;
+    d2psdt2_1 *= (tR_to_tK * tR_to_tK);
+    ps_2 = exp(a2 + b2 / t + c2 * log(t));
+    dpsdt_2 = ps_2 * (-b2 / (t * t) + c2 / t);
+    d2psdt2_2 = dpsdt_2 * (-b2 / (t * t) + c2 / t) + ps_2 * (+2. * b2 / (t * t * t) - c2 / (t * t));
+    ps = (ps_2 - ps_1) / dt * (t - dtrans) + ps_1;
+    dpsdt = (dpsdt_2 - dpsdt_1) / dt * (t - dtrans) + (ps_2 - ps_1) / dt + dpsdt_1;
+    d2psdt2 = (d2psdt2_2 - d2psdt2_1) / dt * (t - dtrans) + (dpsdt_2 - dpsdt_1) / dt +
+              (dpsdt_2 - dpsdt_1) / dt + d2psdt2_1;
+  }
+  else
+  {
+    ps = exp(a2 + b2 / t + c2 * log(t));
+    dpsdt = ps * (-b2 / (t * t) + c2 / t);
+    d2psdt2 = dpsdt * (-b2 / (t * t) + c2 / t) + ps * (+2. * b2 / (t * t * t) - c2 / (t * t));
+  }
+#else
   static const double a1 = 3.03266e6;
   static const double b1 = -2.30733e4;
   static const double a2 = 6.8817602e6;
@@ -39,11 +91,77 @@ DIFF_ps_t_Na(double t, double & ps, double & dpsdt, double & d2psdt2)
     dpsdt = -ps * (c2 / (t * t) + b2 / t);
     d2psdt2 = -dpsdt * (c2 / (t * t) + b2 / t) - ps * (-2. * c2 / (t * t * t) - b2 / (t * t));
   }
+#endif
 }
 //
 void
 DIFF_ps_t_Na(double t, double & ps, double & dpsdt, double & d2psdt2, double & d3psdt3)
 { // units: R, atm
+#ifdef GUPTA_PS
+  static const double dt = 10.;
+  static const double tR_to_tK = 5. / 9.;
+  static const double tK_to_tR = 9. / 5.;
+  static const double dtrans = 1155. * tK_to_tR;
+  double tK = t * tR_to_tK;
+  static const double a1 = 14.631003;
+  static const double b1 = -12818.491;
+  static const double c1 = -0.5;
+  static const double a2 = 12.4494904;
+  static const double b2 = -22029.9768;
+  static const double c2 = -0.242089052;
+
+  if (t < dtrans)
+  {
+    ps = exp(a1 + b1 / tK + c1 * log(tK));
+    dpsdt = ps * (-b1 / (tK * tK) + c1 / tK);
+    d2psdt2 =
+        dpsdt * (-b1 / (tK * tK) + c1 / tK) + ps * (+2. * b1 / (tK * tK * tK) - c1 / (tK * tK));
+    d3psdt3 = d2psdt2 * (-b1 / (tK * tK) + c1 / tK) +
+              dpsdt * (+2. * b1 / (tK * tK * tK) - c1 / (tK * tK)) +
+              dpsdt * (+2. * b1 / (tK * tK * tK) - c1 / (tK * tK)) +
+              ps * (-6. * b1 / (tK * tK * tK * tK) + 2. * c1 / (tK * tK * tK));
+    dpsdt *= tR_to_tK;
+    d2psdt2 *= (tR_to_tK * tR_to_tK);
+    d3psdt3 *= (tR_to_tK * tR_to_tK * tR_to_tK);
+  }
+  else if (t < dtrans + dt)
+  {
+    double ps_1, dpsdt_1, d2psdt2_1, d3psdt3_1, ps_2, dpsdt_2, d2psdt2_2, d3psdt3_2;
+    ps_1 = exp(a1 + b1 / tK + c1 * log(tK));
+    dpsdt_1 = ps_1 * (-b1 / (tK * tK) + c1 / tK);
+    d2psdt2_1 =
+        dpsdt_1 * (-b1 / (tK * tK) + c1 / tK) + ps_1 * (+2. * b1 / (tK * tK * tK) - c1 / (tK * tK));
+    d3psdt3_1 = d2psdt2_1 * (-b1 / (tK * tK) + c1 / tK) +
+                dpsdt_1 * (+2. * b1 / (tK * tK * tK) - c1 / (tK * tK)) +
+                dpsdt_1 * (+2. * b1 / (tK * tK * tK) - c1 / (tK * tK)) +
+                ps_1 * (-6. * b1 / (tK * tK * tK * tK) + 2. * c1 / (tK * tK * tK));
+    dpsdt_1 *= tR_to_tK;
+    d2psdt2_1 *= (tR_to_tK * tR_to_tK);
+    d3psdt3_1 *= (tR_to_tK * tR_to_tK * tR_to_tK);
+    ps_2 = exp(a2 + b2 / t + c2 * log(t));
+    dpsdt_2 = ps_2 * (-b2 / (t * t) + c2 / t);
+    d2psdt2_2 = dpsdt_2 * (-b2 / (t * t) + c2 / t) + ps_2 * (+2. * b2 / (t * t * t) - c2 / (t * t));
+    d3psdt3_2 = d2psdt2_2 * (-b2 / (t * t) + c2 / t) +
+                dpsdt_2 * (+2. * b2 / (t * t * t) - c2 / (t * t)) +
+                dpsdt_2 * (+2. * b2 / (t * t * t) - c2 / (t * t)) +
+                ps_2 * (-6. * b2 / (t * t * t * t) + 2. * c2 / (t * t * t));
+    ps = (ps_2 - ps_1) / dt * (t - dtrans) + ps_1;
+    dpsdt = (dpsdt_2 - dpsdt_1) / dt * (t - dtrans) + (ps_2 - ps_1) / dt + dpsdt_1;
+    d2psdt2 = (d2psdt2_2 - d2psdt2_1) / dt * (t - dtrans) + (dpsdt_2 - dpsdt_1) / dt +
+              (dpsdt_2 - dpsdt_1) / dt + d2psdt2_1;
+    d3psdt3 = (d3psdt3_2 - d3psdt3_1) / dt * (t - dtrans) + (d2psdt2_2 - d2psdt2_1) / dt +
+              (d2psdt2_2 - d2psdt2_1) / dt + (d2psdt2_2 - d2psdt2_1) / dt + d3psdt3_1;
+  }
+  else
+  {
+    ps = exp(a2 + b2 / t + c2 * log(t));
+    dpsdt = ps * (-b2 / (t * t) + c2 / t);
+    d2psdt2 = dpsdt * (-b2 / (t * t) + c2 / t) + ps * (+2. * b2 / (t * t * t) - c2 / (t * t));
+    d3psdt3 = d2psdt2 * (-b2 / (t * t) + c2 / t) + dpsdt * (+2. * b2 / (t * t * t) - c2 / (t * t)) +
+              dpsdt * (+2. * b2 / (t * t * t) - c2 / (t * t)) +
+              ps * (-6. * b2 / (t * t * t * t) + 2. * c2 / (t * t * t));
+  }
+#else
   static const double a1 = 3.03266e6;
   static const double b1 = -2.30733e4;
   static const double a2 = 6.8817602e6;
@@ -96,6 +214,7 @@ DIFF_ps_t_Na(double t, double & ps, double & dpsdt, double & d2psdt2, double & d
               dpsdt * (-2. * c2 / (t * t * t) - b2 / (t * t)) -
               ps * (6. * c2 / (t * t * t * t) + 2. * b2 / (t * t * t));
   }
+#endif
 }
 //
 int
@@ -105,7 +224,7 @@ DIFF_ts_p_Na(double p, double & ts, double & dtsdp, double & d2tsdp2)
 
   static const double tol_p = 1.e-6;
   static const double tmin = 250. * 9. / 5.;
-  static const double tmax = 3000. * 9. / 5.;
+  static const double tmax = 2300. * 9. / 5.;
   static const double tnb = 1154.7 * 9. / 5.;
   // initial guess from normal boiling point in R
   ts = tnb;
@@ -139,6 +258,52 @@ DIFF_ts_p_Na(double p, double & ts, double & dtsdp, double & d2tsdp2)
 void
 DIFF_d1_t_Na(double t, double & d1, double & dd1dt, double & d2d1dt2)
 { // units: R, lb/ft3
+#ifdef GUPTA_D1
+  static const double a = 1.9799513;
+  static const double b = 2.761335;
+  static const double c = -2.261627;
+  static const double d = 4.651817;
+  static const double e = 0.53;
+  static const double tc = 2508.7;
+  static const double dt = 10.;
+  static const double kg_m3_to_lb_ft3 = 0.3048 * 0.3048 * 0.3048 / 0.45359237;
+  static const double g_cc_to_lb_ft3 = kg_m3_to_lb_ft3 * 1.e3;
+  static const double dc = 0.2141 * g_cc_to_lb_ft3;
+  static const double tK_to_tR = 9. / 5.;
+  static const double tR_to_tK = 1. / tK_to_tR;
+  //
+  double tK = t * tR_to_tK;
+  double tt = tK / tc;
+  double dttdt = tR_to_tK / tc;
+  double dtrans = 0.78 * tc * tK_to_tR;
+  if (t < dtrans)
+  {
+    d1 = (a + b * (1. - tt)) * dc;
+    dd1dt = -b * dc * dttdt;
+    d2d1dt2 = 0.;
+  }
+  else if (t < dtrans + dt)
+  {
+    double d1_1, dd1dt_1, d2d1dt2_1;
+    double d1_2, dd1dt_2, d2d1dt2_2;
+    d1_1 = (a + b * (1. - tt)) * dc;
+    dd1dt_1 = -b * dc * dttdt;
+    d2d1dt2_1 = 0.;
+    d1_2 = (c * (1. - tt) + d * pow((1. - tt), e) + 1.) * dc;
+    dd1dt_2 = (-c - e * d * pow((1. - tt), e - 1.)) * dc * dttdt;
+    d2d1dt2_2 = e * (e - 1.) * d * pow((1. - tt), e - 2.) * dc * dttdt * dttdt;
+    d1 = (d1_2 - d1_1) / dt * (t - dtrans) + d1_1;
+    dd1dt = (dd1dt_2 - dd1dt_1) / dt * (t - dtrans) + (d1_2 - d1_1) / dt + dd1dt_1;
+    d2d1dt2 = (d2d1dt2_2 - d2d1dt2_1) / dt * (t - dtrans) + (dd1dt_2 - dd1dt_1) / dt +
+              (dd1dt_2 - dd1dt_1) / dt + d2d1dt2_1;
+  }
+  else
+  {
+    d1 = (c * (1. - tt) + d * pow((1. - tt), e) + 1.) * dc;
+    dd1dt = (-c - e * d * pow((1. - tt), e - 1.)) * dc * dttdt;
+    d2d1dt2 = e * (e - 1.) * d * pow((1. - tt), e - 2.) * dc * dttdt * dttdt;
+  }
+#else
   double tt;
   //
   static const double a = 59.566;
@@ -150,11 +315,64 @@ DIFF_d1_t_Na(double t, double & d1, double & dd1dt, double & d2d1dt2)
   d1 = a + tt * (b + tt * (c + tt * d));
   dd1dt = b + tt * (2. * c + tt * 3. * d);
   d2d1dt2 = 2. * c + tt * 6. * d;
+#endif
 }
 //
 void
 DIFF_d1_t_Na(double t, double & d1, double & dd1dt, double & d2d1dt2, double & d3d1dt3)
 { // units: R, lb/ft3
+#ifdef GUPTA_D1
+  static const double a = 1.9799513;
+  static const double b = 2.761335;
+  static const double c = -2.261627;
+  static const double d = 4.651817;
+  static const double e = 0.53;
+  static const double tc = 2508.7;
+  static const double dt = 10.;
+  static const double kg_m3_to_lb_ft3 = 0.3048 * 0.3048 * 0.3048 / 0.45359237;
+  static const double g_cc_to_lb_ft3 = kg_m3_to_lb_ft3 * 1.e3;
+  static const double dc = 0.2141 * g_cc_to_lb_ft3;
+  static const double tK_to_tR = 9. / 5.;
+  static const double tR_to_tK = 1. / tK_to_tR;
+  //
+  double tK = t * tR_to_tK;
+  double tt = tK / tc;
+  double dttdt = tR_to_tK / tc;
+  double dtrans = 0.78 * tc * tK_to_tR;
+  if (t < dtrans)
+  {
+    d1 = (a + b * (1. - tt)) * dc;
+    dd1dt = -b * dc * dttdt;
+    d2d1dt2 = 0.;
+    d3d1dt3 = 0.;
+  }
+  else if (t < dtrans + dt)
+  {
+    double d1_1, dd1dt_1, d2d1dt2_1, d3d1dt3_1;
+    double d1_2, dd1dt_2, d2d1dt2_2, d3d1dt3_2;
+    d1_1 = (a + b * (1. - tt)) * dc;
+    dd1dt_1 = -b * dc * dttdt;
+    d2d1dt2_1 = 0.;
+    d3d1dt3_1 = 0.;
+    d1_2 = (c * (1. - tt) + d * pow((1. - tt), e) + 1.) * dc;
+    dd1dt_2 = (-c - e * d * pow((1. - tt), e - 1.)) * dc * dttdt;
+    d2d1dt2_2 = e * (e - 1.) * d * pow((1. - tt), e - 2.) * dc * dttdt * dttdt;
+    d3d1dt3_2 = -e * (e - 1.) * (e - 2.) * d * pow((1. - tt), e - 3.) * dc * dttdt * dttdt * dttdt;
+    d1 = (d1_2 - d1_1) / dt * (t - dtrans) + d1_1;
+    dd1dt = (dd1dt_2 - dd1dt_1) / dt * (t - dtrans) + (d1_2 - d1_1) / dt + dd1dt_1;
+    d2d1dt2 = (d2d1dt2_2 - d2d1dt2_1) / dt * (t - dtrans) + (dd1dt_2 - dd1dt_1) / dt +
+              (dd1dt_2 - dd1dt_1) / dt + d2d1dt2_1;
+    d3d1dt3 = (d3d1dt3_2 - d3d1dt3_1) / dt * (t - dtrans) + (d2d1dt2_2 - d2d1dt2_1) / dt +
+              (d2d1dt2_2 - d2d1dt2_1) / dt + (d2d1dt2_2 - d2d1dt2_1) / dt + d3d1dt3_1;
+  }
+  else
+  {
+    d1 = (c * (1. - tt) + d * pow((1. - tt), e) + 1.) * dc;
+    dd1dt = (-c - e * d * pow((1. - tt), e - 1.)) * dc * dttdt;
+    d2d1dt2 = e * (e - 1.) * d * pow((1. - tt), e - 2.) * dc * dttdt * dttdt;
+    d3d1dt3 = -e * (e - 1.) * (e - 2.) * d * pow((1. - tt), e - 3.) * dc * dttdt * dttdt * dttdt;
+  }
+#else
   double tt;
   //
   static const double a = 59.566;
@@ -167,6 +385,45 @@ DIFF_d1_t_Na(double t, double & d1, double & dd1dt, double & d2d1dt2, double & d
   dd1dt = b + tt * (2. * c + tt * 3. * d);
   d2d1dt2 = 2. * c + tt * 6. * d;
   d3d1dt3 = 6. * d;
+#endif
+}
+//
+int
+DIFF_ts_d1_Na(double d1, double & ts, double & dtsdd1, double & d2tsdd12)
+{ // units: R, lb/ft3
+  double d1x, dd1dt, d2d1dt2;
+
+  static const double tol_d1 = 1.e-6;
+  static const double tmin = 250. * 9. / 5.;
+  static const double tmax = 2300. * 9. / 5.;
+  static const double tnb = 1154.7 * 9. / 5.;
+  // initial guess from normal boiling point in R
+  ts = tnb;
+
+  int it = 0;
+  double dd1 = 1.;
+  while (fabs(dd1) / d1 > tol_d1)
+  {
+    DIFF_d1_t_Na(ts, d1x, dd1dt, d2d1dt2);
+    dd1 = d1x - d1;
+    ts -= dd1 / dd1dt;
+    if (ts < tmin)
+    {
+      ts = tmin;
+    }
+    else if (ts > tmax)
+    {
+      ts = tmax;
+    }
+    if (++it > 20)
+    {
+      return -1;
+    }
+  }
+  DIFF_d1_t_Na(ts, d1x, dd1dt, d2d1dt2);
+  dtsdd1 = 1. / dd1dt;
+  d2tsdd12 = -d2d1dt2 * dtsdd1 * dtsdd1 * dtsdd1;
+  return 0;
 }
 //
 void
@@ -180,6 +437,8 @@ DIFF_v1_t_Na(double t, double & v1, double & dv1dt, double & d2v1dt2)
   dv1dt = -dd1dt * v1 * v1;
   d2v1dt2 = v1 * v1 * (dd1dt * dd1dt * 2. * v1 - d2d1dt2);
 }
+//
+#ifndef GUPTA_BETA_T
 //
 //-----------------------------------------------------------------------------
 // isothermal compressibility in the liquid phase (derived from Fink et al.)
@@ -360,6 +619,236 @@ DIFF_d_tp_L_Na(double t,
   d3dldtdp2 = 0.0;
   d3dldt2dp = d2d1dt2 * betat + 2. * dd1dt * dbetatdt + d1 * d2betatdt2;
 }
+#else
+//
+//-----------------------------------------------------------------------------
+// isothermal compressibility in the liquid phase and its integrals acc. to Gupta
+//-----------------------------------------------------------------------------
+//
+void
+DIFF_intdl_tp_L_Na(double t,
+                   double p,
+                   double & intdl,
+                   double & dintdldt,
+                   double & d2intdldt2,
+                   double & d3intdldt3,
+                   double & dintdldp,
+                   double & d2intdldp2,
+                   double & d2intdldtdp,
+                   double & d3intdldt2dp,
+                   double & d3intdldtdp2)
+{
+  static const double a = 1.7994e-5;
+  static const double b = 1.2773035e0;
+  static const double c = -7.281814e-4;
+  static const double d = 8.730754e-8;
+  static const double e = -2.212105e-8;
+  static const double f = -1.912547e-8;
+  static const double coeff1 = e * 0.5 * 1.e-3;
+  static const double coeff2 = f * 0.5 * 1.e-6;
+  //
+  double den = b + t * (c + t * d);
+  double den2 = den * den;
+  double den3 = den2 * den;
+  double den4 = den2 * den2;
+  double den8 = den4 * den4;
+  double ddendt = c + 2. * t * d;
+  double d2dendt2 = 2. * d;
+  intdl = a / den * p + coeff1 * t * p * p + coeff2 * t * t * p * p;
+  dintdldt = -a * ddendt / (den2)*p + coeff1 * p * p + coeff2 * 2. * t * p * p;
+  double num = a * d2dendt2 * den2 - a * ddendt * 2. * den * ddendt;
+  double dnumdt = 2. * a * ddendt * (d2dendt2 * den - ddendt * ddendt - 2. * den * d2dendt2);
+  d2intdldt2 = -num / (den4)*p + coeff2 * 2. * p * p;
+  d3intdldt3 = -(dnumdt * den4 - num * 4. * den3 * ddendt) / (den8)*p;
+  dintdldp = a / den + coeff1 * 2. * t * p + coeff2 * 2. * t * t * p;
+  d2intdldp2 = coeff1 * 2. * t + coeff2 * 2. * t * t;
+  d2intdldtdp = -a * ddendt / (den2) + coeff1 * 2. * p + coeff2 * 4. * t * p;
+  d3intdldt2dp = -num / (den4) + coeff2 * 4. * p;
+  d3intdldtdp2 = coeff1 * 2. + coeff2 * 4. * t;
+}
+//
+void
+DIFF_intdl_tp_L_Na(double t,
+                   double p,
+                   double & intdl,
+                   double & dintdldt,
+                   double & d2intdldt2,
+                   double & dintdldp,
+                   double & d2intdldp2,
+                   double & d2intdldtdp)
+{
+  static const double a = 1.7994e-5;
+  static const double b = 1.2773035e0;
+  static const double c = -7.281814e-4;
+  static const double d = 8.730754e-8;
+  static const double e = -2.212105e-8;
+  static const double f = -1.912547e-8;
+  static const double coeff1 = e * 0.5 * 1.e-3;
+  static const double coeff2 = f * 0.5 * 1.e-6;
+  //
+  double den = b + t * (c + t * d);
+  double den2 = den * den;
+  double den4 = den2 * den2;
+  double ddendt = c + 2. * t * d;
+  double d2dendt2 = 2. * d;
+  intdl = a / den * p + coeff1 * t * p * p + coeff2 * t * t * p * p;
+  dintdldt = -a * ddendt / (den2)*p + coeff1 * p * p + coeff2 * 2. * t * p * p;
+  double num = a * d2dendt2 * den2 - a * ddendt * 2. * den * ddendt;
+  d2intdldt2 = -num / (den4)*p + coeff2 * 2. * p * p;
+  dintdldp = a / den + coeff1 * 2. * t * p + coeff2 * 2. * t * t * p;
+  d2intdldp2 = coeff1 * 2. * t + coeff2 * 2. * t * t;
+  d2intdldtdp = -a * ddendt / (den2) + coeff1 * 2. * p + coeff2 * 4. * t * p;
+}
+//
+void
+DIFF_d_tp_L_Na(double t,
+               double p,
+               double & dl,
+               double & ddldt,
+               double & d2dldt2,
+               double & d3dldt3,
+               double & ddldp,
+               double & d2dldp2,
+               double & d2dldtdp,
+               double & d3dldt2dp,
+               double & d3dldtdp2)
+{
+  static const double tK_to_tR = 9. / 5.;
+  static const double tR_to_tK = 1. / tK_to_tR;
+  static const double kg_m3_to_lb_ft3 = 0.3048 * 0.3048 * 0.3048 / 0.45359237;
+  static const double g_cc_to_lb_ft3 = kg_m3_to_lb_ft3 * 1.e3;
+  static const double lb_ft3_to_g_cc = 1. / g_cc_to_lb_ft3;
+  // unit conversion
+  double tK = t * tR_to_tK;
+  // evaluate integral for (t,p)
+  double intdl, dintdldt, d2intdldt2, d3intdldt3, dintdldp, d2intdldp2, d2intdldtdp, d3intdldt2dp,
+      d3intdldtdp2;
+  DIFF_intdl_tp_L_Na(tK,
+                     p,
+                     intdl,
+                     dintdldt,
+                     d2intdldt2,
+                     d3intdldt3,
+                     dintdldp,
+                     d2intdldp2,
+                     d2intdldtdp,
+                     d3intdldt2dp,
+                     d3intdldtdp2);
+  // and for (t, ps(t))
+  double p_s, dpsdt, d2psdt2, d3psdt3;
+  DIFF_ps_t_Na(t, p_s, dpsdt, d2psdt2, d3psdt3);
+  dpsdt *= tK_to_tR;
+  d2psdt2 *= (tK_to_tR * tK_to_tR);
+  d3psdt3 *= (tK_to_tR * tK_to_tR * tK_to_tR);
+  double intdl_s, dintdldt_s, d2intdldt2_s, d3intdldt3_s, dintdldp_s, d2intdldp2_s, d2intdldtdp_s,
+      d3intdldt2dp_s, d3intdldtdp2_s;
+  DIFF_intdl_tp_L_Na(tK,
+                     p_s,
+                     intdl_s,
+                     dintdldt_s,
+                     d2intdldt2_s,
+                     d3intdldt3_s,
+                     dintdldp_s,
+                     d2intdldp2_s,
+                     d2intdldtdp_s,
+                     d3intdldt2dp_s,
+                     d3intdldtdp2_s);
+  // density at saturation
+  double d1, dd1dt, d2d1dt2, d3d1dt3;
+  DIFF_d1_t_Na(t, d1, dd1dt, d2d1dt2, d3d1dt3);
+  d1 *= lb_ft3_to_g_cc;
+  dd1dt *= lb_ft3_to_g_cc / tR_to_tK;
+  d2d1dt2 *= lb_ft3_to_g_cc / (tR_to_tK * tR_to_tK);
+  d3d1dt3 *= lb_ft3_to_g_cc / (tR_to_tK * tR_to_tK * tR_to_tK);
+  // density
+  dl = intdl - intdl_s + d1;
+  ddldt = dintdldt - (dintdldt_s + dintdldp_s * dpsdt) + dd1dt;
+  d2dldt2 = d2intdldt2 -
+            (d2intdldt2_s + d2intdldtdp_s * dpsdt + (d2intdldtdp_s + d2intdldp2_s * dpsdt) * dpsdt +
+             dintdldp_s * d2psdt2) +
+            d2d1dt2;
+  double d3intdldp3_s = 0.;
+  d3dldt3 = d3intdldt3 -
+            (d3intdldt3_s + d3intdldt2dp_s * dpsdt +
+             (d3intdldt2dp_s + d3intdldtdp2_s * dpsdt) * dpsdt + d2intdldtdp_s * d2psdt2 +
+             (d3intdldt2dp_s + d3intdldtdp2_s * dpsdt +
+              (d3intdldtdp2_s + d3intdldp3_s * dpsdt) * dpsdt + d2intdldp2_s * d2psdt2) *
+                 dpsdt +
+             (d2intdldtdp_s + d2intdldp2_s * dpsdt) * d2psdt2 +
+             (d2intdldtdp_s + d2intdldp2_s * dpsdt) * d2psdt2 + dintdldp_s * d3psdt3) +
+            d3d1dt3;
+  ddldp = dintdldp;
+  d2dldp2 = d2intdldp2;
+  d2dldtdp = d2intdldtdp;
+  d3dldt2dp = d3intdldt2dp;
+  d3dldtdp2 = d3intdldtdp2;
+  // unit conversion (d: g/cc -> lb/ft3; t: K -> R)
+  dl *= g_cc_to_lb_ft3;
+  ddldt *= (g_cc_to_lb_ft3 / tK_to_tR);
+  d2dldt2 *= (g_cc_to_lb_ft3 / (tK_to_tR * tK_to_tR));
+  d3dldt3 *= (g_cc_to_lb_ft3 / (tK_to_tR * tK_to_tR * tK_to_tR));
+  ddldp *= g_cc_to_lb_ft3;
+  d2dldp2 *= g_cc_to_lb_ft3;
+  d2dldtdp *= (g_cc_to_lb_ft3 / tK_to_tR);
+  d3dldt2dp *= (g_cc_to_lb_ft3 / (tK_to_tR * tK_to_tR));
+  d3dldtdp2 *= (g_cc_to_lb_ft3 / tK_to_tR);
+}
+//
+void
+DIFF_d_tp_L_Na(double t,
+               double p,
+               double & dl,
+               double & ddldt,
+               double & d2dldt2,
+               double & ddldp,
+               double & d2dldp2,
+               double & d2dldtdp)
+{
+  static const double tK_to_tR = 9. / 5.;
+  static const double tR_to_tK = 1. / tK_to_tR;
+  static const double kg_m3_to_lb_ft3 = 0.3048 * 0.3048 * 0.3048 / 0.45359237;
+  static const double g_cc_to_lb_ft3 = kg_m3_to_lb_ft3 * 1.e3;
+  static const double lb_ft3_to_g_cc = 1. / g_cc_to_lb_ft3;
+  // unit conversion
+  double tK = t * tR_to_tK;
+  // evaluate integral for (t,p)
+  double intdl, dintdldt, d2intdldt2, dintdldp, d2intdldp2, d2intdldtdp;
+  DIFF_intdl_tp_L_Na(tK, p, intdl, dintdldt, d2intdldt2, dintdldp, d2intdldp2, d2intdldtdp);
+  // and for (t, ps(t))
+  double p_s, dpsdt, d2psdt2;
+  DIFF_ps_t_Na(t, p_s, dpsdt, d2psdt2);
+  dpsdt *= tK_to_tR;
+  d2psdt2 *= (tK_to_tR * tK_to_tR);
+  double intdl_s, dintdldt_s, d2intdldt2_s, dintdldp_s, d2intdldp2_s, d2intdldtdp_s;
+  DIFF_intdl_tp_L_Na(
+      tK, p_s, intdl_s, dintdldt_s, d2intdldt2_s, dintdldp_s, d2intdldp2_s, d2intdldtdp_s);
+  // density at saturation
+  double d1, dd1dt, d2d1dt2;
+  DIFF_d1_t_Na(t, d1, dd1dt, d2d1dt2);
+  d1 *= lb_ft3_to_g_cc;
+  dd1dt *= lb_ft3_to_g_cc / tR_to_tK;
+  d2d1dt2 *= lb_ft3_to_g_cc / (tR_to_tK * tR_to_tK);
+  // density
+  dl = intdl - intdl_s + d1;
+  ddldt = dintdldt - (dintdldt_s + dintdldp_s * dpsdt) + dd1dt;
+  d2dldt2 = d2intdldt2 -
+            (d2intdldt2_s + d2intdldtdp_s * dpsdt + (d2intdldtdp_s + d2intdldp2_s * dpsdt) * dpsdt +
+             dintdldp_s * d2psdt2) +
+            d2d1dt2;
+  ddldp = dintdldp;
+  d2dldp2 = d2intdldp2;
+  d2dldtdp = d2intdldtdp;
+  // unit conversion (d: g/cc -> lb/ft3; t: K -> R)
+  dl *= g_cc_to_lb_ft3;
+  ddldt *= (g_cc_to_lb_ft3 / tK_to_tR);
+  d2dldt2 *= (g_cc_to_lb_ft3 / (tK_to_tR * tK_to_tR));
+  ddldp *= g_cc_to_lb_ft3;
+  d2dldp2 *= g_cc_to_lb_ft3;
+  d2dldtdp *= (g_cc_to_lb_ft3 / tK_to_tR);
+}
+#endif
+//
+//-----------------------------------------------------------------------------
 //
 void
 DIFF_v_tp_L_Na(double t,
@@ -620,7 +1109,7 @@ DIFF_s_tp_L_Na(double t,
               term0 * (d2dlpdtdp * term2 + ddlpdt - ddlpdp * dpsdt)) *
              b;
 }
-//
+
 void
 DIFF_hs_tp_L_Na(double t,
                 double p,
@@ -637,7 +1126,8 @@ DIFF_hs_tp_L_Na(double t,
                 double & d2sldp2,
                 double & d2sldtdp)
 { // units: R, atm, Btu/lb
-  double ps, dpsdt, d2psdt2, h1, dh1dt, d2h1dt2, s1, ds1dt, d2s1dt2, dlp, ddlpdt, d2dlpdt2, ddlpdp, d2dlpdp2, d2dlpdtdp;
+  double ps, dpsdt, d2psdt2, h1, dh1dt, d2h1dt2, s1, ds1dt, d2s1dt2, dlp, ddlpdt, d2dlpdt2, ddlpdp,
+      d2dlpdp2, d2dlpdtdp;
   double dl, ddldt, d2dldt2, d3dldt3, ddldp, d2dldp2, d2dldtdp, d3dldt2dp, d3dldtdp2;
   double dl_inv, term0, dterm0dt, d2term0dt2, dterm0dp, d2term0dp2, d2term0dtdp;
   double term1, dterm1dt, d2term1dt2, dterm1dp, d2term1dp2, d2term1dtdp, term2;
@@ -1373,21 +1863,22 @@ DIFF_h_tp_G_Na(double t,
   d2hvdp2 = -d2b2hdp2 * chv1 - d2b4hdp2 * chv2;
   d2hvdtdp = -d2b2hdtdp * chv1 - d2b4hdtdp * chv2;
 }
+//
 void
 DIFF_vh_tp_G_Na(double t,
-               double p,
-               double & vv,
-               double & dvvdt,
-               double & d2vvdt2,
-               double & dvvdp,
-               double & d2vvdp2,
-               double & d2vvdtdp,
-               double & hv,
-               double & dhvdt,
-               double & d2hvdt2,
-               double & dhvdp,
-               double & d2hvdp2,
-               double & d2hvdtdp)
+                double p,
+                double & vv,
+                double & dvvdt,
+                double & d2vvdt2,
+                double & dvvdp,
+                double & d2vvdp2,
+                double & d2vvdtdp,
+                double & hv,
+                double & dhvdt,
+                double & d2hvdt2,
+                double & dhvdp,
+                double & d2hvdp2,
+                double & d2hvdtdp)
 { // units: R, atm, ft3/lb, , Btu/lb
   double h1, dh1dt, d2h1dt2, dhv, ddhvdt, d2dhvdt2;
   double h2, dh2dt, d2h2dt2;
@@ -1820,19 +2311,19 @@ DIFF_s_tp_G_Na(double t,
 //
 void
 DIFF_hs_tp_G_Na(double t,
-               double p,
-               double & hv,
-               double & dhvdt,
-               double & d2hvdt2,
-               double & dhvdp,
-               double & d2hvdp2,
-               double & d2hvdtdp,
-               double & sv,
-               double & dsvdt,
-               double & d2svdt2,
-               double & dsvdp,
-               double & d2svdp2,
-               double & d2svdtdp)
+                double p,
+                double & hv,
+                double & dhvdt,
+                double & d2hvdt2,
+                double & dhvdp,
+                double & d2hvdp2,
+                double & d2hvdtdp,
+                double & sv,
+                double & dsvdt,
+                double & d2svdt2,
+                double & dsvdp,
+                double & d2svdp2,
+                double & d2svdtdp)
 { // units: R, Btu/(lb*F)
   double h1, dh1dt, d2h1dt2, dhv, ddhvdt, d2dhvdt2;
   double h2, dh2dt, d2h2dt2;
@@ -2273,7 +2764,7 @@ FLASH_prho_L_Na(double p, double rho, double & t)
 {
   static const double tol_v = 1.e-6;
   static const double tmin = 250. * 9. / 5.;
-  static const double tmax = 3000. * 9. / 5.;
+  static const double tmax = 2300. * 9. / 5.;
 
   double ts, dtsdp, d2tsdp2;
   double vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
@@ -2316,9 +2807,10 @@ DERIV_prho_L_Na(double t, double p, double & du_dp_rho, double & du_drho_p)
   double dudt, dudp;
   double dp_dv_u, dp_du_v;
 
-  //DIFF_v_tp_L_Na(t, p, v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
-  //DIFF_h_tp_L_Na(t, p, h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-  DIFF_vh_tp_L_Na(t, p, v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+  // DIFF_v_tp_L_Na(t, p, v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+  // DIFF_h_tp_L_Na(t, p, h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+  DIFF_vh_tp_L_Na(
+      t, p, v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
 
   // u = h - p * v * atmft3_toBtu;
   dudt = dhdt - p * dvdt * atmft3_toBtu;
@@ -2336,7 +2828,7 @@ FLASH_prho_G_Na(double p, double rho, double & t)
 {
   static const double tol_v = 1.e-6;
   static const double tmin = 400. * 9. / 5.;
-  static const double tmax = 3000. * 9. / 5.;
+  static const double tmax = 2300. * 9. / 5.;
 
   double ts, dtsdp, d2tsdp2;
   double vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
@@ -2347,6 +2839,7 @@ FLASH_prho_G_Na(double p, double rho, double & t)
   double v = 1. / rho;
 
   int it = 0;
+
   double dv = 1.e12;
   while (fabs(dv) / v > tol_v)
   {
@@ -2379,9 +2872,10 @@ DERIV_prho_G_Na(double t, double p, double & du_dp_rho, double & du_drho_p)
   double dudt, dudp;
   double dp_dv_u, dp_du_v;
 
-  //DIFF_v_tp_G_Na(t, p, v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
-  //DIFF_h_tp_G_Na(t, p, h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-  DIFF_vh_tp_G_Na(t, p, v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+  // DIFF_v_tp_G_Na(t, p, v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+  // DIFF_h_tp_G_Na(t, p, h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+  DIFF_vh_tp_G_Na(
+      t, p, v, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, h, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
   // u = h - p * v * atmft3_toBtu;
   dudt = dhdt - p * dvdt * atmft3_toBtu;
   dudp = dhdp - (v + p * dvdp) * atmft3_toBtu;
@@ -2398,7 +2892,7 @@ FLASH_ph_L_Na(double p, double h, double & t)
 {
   static const double tol_h = 1.e-6;
   static const double tmin = 250. * 9. / 5.;
-  static const double tmax = 3000. * 9. / 5.;
+  static const double tmax = 2300. * 9. / 5.;
 
   double ts, dtsdp, d2tsdp2;
   double hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
@@ -2434,7 +2928,7 @@ FLASH_ph_G_Na(double p, double h, double & t)
 {
   static const double tol_h = 1.e-6;
   static const double tmin = 400. * 9. / 5.;
-  static const double tmax = 3000. * 9. / 5.;
+  static const double tmax = 2300. * 9. / 5.;
 
   double ts, dtsdp, d2tsdp2;
   double hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
@@ -2470,7 +2964,7 @@ FLASH_ps_L_Na(double p, double s, double & t)
 {
   static const double tol_s = 1.e-8;
   static const double tmin = 250. * 9. / 5.;
-  static const double tmax = 3000. * 9. / 5.;
+  static const double tmax = 2300. * 9. / 5.;
 
   double ts, dtsdp, d2tsdp2;
   double sl, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
@@ -2506,7 +3000,7 @@ FLASH_ps_G_Na(double p, double s, double & t)
 {
   static const double tol_s = 1.e-8;
   static const double tmin = 400. * 9. / 5.;
-  static const double tmax = 3000. * 9. / 5.;
+  static const double tmax = 2300. * 9. / 5.;
 
   double ts, dtsdp, d2tsdp2;
   double sv, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
@@ -2543,27 +3037,31 @@ FLASH_vu_L_Na(double v, double u, double & t, double & p)
   static const double tol_v = 1.e-6;
   static const double tol_u = 1.e-6;
   static const double tmin = 250. * 9. / 5.;
-  static const double tmax = 3000. * 9. / 5.;
+  static const double tmax = 2300. * 9. / 5.;
   static const double pmin = 1.e-5;
+  static const double pmax = 1.e3;
   static const double atmft3_toBtu = (101325. * 0.3048 * 0.3048 * 0.3048) / 1055.05585262;
 
+  double ts, dtsdd1, d2tsdd1, ps, dpsdt, d2psdt2;
   double vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
   double ul;
 
-  // initial guess from normal boiling point in R
-  static const double tnb = 1154.7 * 9. / 5.;
-  t = tnb;
-  p = 1.;
+  // initial guess from saturation curve
+  DIFF_ts_d1_Na(1. / v, ts, dtsdd1, d2tsdd1);
+  DIFF_ps_t_Na(ts, ps, dpsdt, d2psdt2);
+  t = ts;
+  p = ps;
 
   int it = 0;
   double dv = 1.e12, du = 1.e12;
   double ddudt, ddudp, ddvdt, ddvdp, den;
   while (fabs(dv) / v > tol_v || fabs(du) > tol_u)
   {
-    //DIFF_v_tp_L_Na(t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
-    //DIFF_h_tp_L_Na(t, p, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-    DIFF_vh_tp_L_Na(t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+    // DIFF_v_tp_L_Na(t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+    // DIFF_h_tp_L_Na(t, p, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+    DIFF_vh_tp_L_Na(
+        t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
     ul = hl - p * vl * atmft3_toBtu;
     dv = vl - v;
     du = ul - u;
@@ -2583,7 +3081,13 @@ FLASH_vu_L_Na(double v, double u, double & t, double & p)
       t = tmax;
     }
     if (p < pmin)
+    {
       p = pmin;
+    }
+    else if (p > pmax)
+    {
+      p = pmax;
+    }
     if (++it > 50)
     {
       return -1;
@@ -2602,9 +3106,10 @@ DERIV_vu_L_Na(
   double hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
   double dudt, dudp;
 
-  //DIFF_v_tp_L_Na(t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
-  //DIFF_h_tp_L_Na(t, p, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-  DIFF_vh_tp_L_Na(t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+  // DIFF_v_tp_L_Na(t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+  // DIFF_h_tp_L_Na(t, p, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+  DIFF_vh_tp_L_Na(
+      t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
   // ul = hl - p * vl * atmft3_toBtu;
   dudt = dhdt - p * dvdt * atmft3_toBtu;
   dudp = dhdp - (vl + p * dvdp) * atmft3_toBtu;
@@ -2621,7 +3126,7 @@ FLASH_vu_G_Na(double v, double u, double & t, double & p)
   static const double tol_v = 1.e-6;
   static const double tol_u = 1.e-6;
   static const double tmin = 400. * 9. / 5.;
-  static const double tmax = 3000. * 9. / 5.;
+  static const double tmax = 2300. * 9. / 5.;
   static const double pmin = 1.e-5;
   static const double atmft3_toBtu = (101325. * 0.3048 * 0.3048 * 0.3048) / 1055.05585262;
 
@@ -2639,9 +3144,10 @@ FLASH_vu_G_Na(double v, double u, double & t, double & p)
   double ddudt, ddudp, ddvdt, ddvdp, den;
   while (fabs(dv) / v > tol_v || fabs(du) > tol_u)
   {
-    //DIFF_v_tp_G_Na(t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
-    //DIFF_h_tp_G_Na(t, p, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-    DIFF_vh_tp_G_Na(t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+    // DIFF_v_tp_G_Na(t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+    // DIFF_h_tp_G_Na(t, p, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+    DIFF_vh_tp_G_Na(
+        t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
     uv = hv - p * vv * atmft3_toBtu;
     dv = vv - v;
     du = uv - u;
@@ -2680,9 +3186,10 @@ DERIV_vu_G_Na(
   double hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
   double dudt, dudp;
 
-  //DIFF_v_tp_G_Na(t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
-  //DIFF_h_tp_G_Na(t, p, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-  DIFF_vh_tp_G_Na(t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+  // DIFF_v_tp_G_Na(t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+  // DIFF_h_tp_G_Na(t, p, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+  DIFF_vh_tp_G_Na(
+      t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
   // uv = hv - p * vv * atmft3_toBtu;
   dudt = dhdt - p * dvdt * atmft3_toBtu;
   dudp = dhdp - (vv + p * dvdp) * atmft3_toBtu;
@@ -2699,7 +3206,7 @@ FLASH_vh_L_Na(double v, double h, double & t, double & p)
   static const double tol_v = 1.e-6;
   static const double tol_h = 1.e-6;
   static const double tmin = 250. * 9. / 5.;
-  static const double tmax = 3000. * 9. / 5.;
+  static const double tmax = 2300. * 9. / 5.;
   static const double pmin = 1.e-5;
 
   double vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
@@ -2715,9 +3222,10 @@ FLASH_vh_L_Na(double v, double h, double & t, double & p)
   double ddhdt, ddhdp, ddvdt, ddvdp, den;
   while (fabs(dv) / v > tol_v || fabs(dh) > tol_h)
   {
-    //DIFF_v_tp_L_Na(t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
-    //DIFF_h_tp_L_Na(t, p, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-    DIFF_vh_tp_L_Na(t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+    // DIFF_v_tp_L_Na(t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+    // DIFF_h_tp_L_Na(t, p, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+    DIFF_vh_tp_L_Na(
+        t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
     dv = vl - v;
     dh = hl - h;
     ddvdt = dvdt;
@@ -2752,9 +3260,10 @@ DERIV_vh_L_Na(
   double vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
 
-  //DIFF_v_tp_L_Na(t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
-  //DIFF_h_tp_L_Na(t, p, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-  DIFF_vh_tp_L_Na(t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+  // DIFF_v_tp_L_Na(t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+  // DIFF_h_tp_L_Na(t, p, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+  DIFF_vh_tp_L_Na(
+      t, p, vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
 
   dp_dv_h = 1. / (dvdp - dvdt * dhdp / dhdt);
   dp_dh_v = 1. / (dhdp - dhdt * dvdp / dvdt);
@@ -2768,7 +3277,7 @@ FLASH_vh_G_Na(double v, double h, double & t, double & p)
   static const double tol_v = 1.e-6;
   static const double tol_h = 1.e-6;
   static const double tmin = 400. * 9. / 5.;
-  static const double tmax = 3000. * 9. / 5.;
+  static const double tmax = 2300. * 9. / 5.;
   static const double pmin = 1.e-5;
 
   double vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
@@ -2784,9 +3293,10 @@ FLASH_vh_G_Na(double v, double h, double & t, double & p)
   double ddhdt, ddhdp, ddvdt, ddvdp, den;
   while (fabs(dv) / v > tol_v || fabs(dh) > tol_h)
   {
-    //DIFF_v_tp_G_Na(t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
-    //DIFF_h_tp_G_Na(t, p, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-    DIFF_vh_tp_G_Na(t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+    // DIFF_v_tp_G_Na(t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+    // DIFF_h_tp_G_Na(t, p, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+    DIFF_vh_tp_G_Na(
+        t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
     dv = vv - v;
     dh = hv - h;
     ddvdt = dvdt;
@@ -2821,9 +3331,10 @@ DERIV_vh_G_Na(
   double vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
 
-  //DIFF_v_tp_G_Na(t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
-  //DIFF_h_tp_G_Na(t, p, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-  DIFF_vh_tp_G_Na(t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+  // DIFF_v_tp_G_Na(t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp);
+  // DIFF_h_tp_G_Na(t, p, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+  DIFF_vh_tp_G_Na(
+      t, p, vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
 
   dp_dv_h = 1. / (dvdp - dvdt * dhdp / dhdt);
   dp_dh_v = 1. / (dhdp - dhdt * dvdp / dvdt);
@@ -2837,7 +3348,7 @@ FLASH_hs_L_Na(double h, double s, double & t, double & p)
   static const double tol_h = 1.e-6;
   static const double tol_s = 1.e-8;
   static const double tmin = 250. * 9. / 5.;
-  static const double tmax = 3000. * 9. / 5.;
+  static const double tmax = 2300. * 9. / 5.;
   static const double pmin = 1.e-5;
 
   double hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
@@ -2853,9 +3364,10 @@ FLASH_hs_L_Na(double h, double s, double & t, double & p)
   double ddhdt, ddhdp, ddsdt, ddsdp, den;
   while (fabs(dh) > tol_h || fabs(ds) > tol_s)
   {
-    //DIFF_h_tp_L_Na(t, p, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-    //DIFF_s_tp_L_Na(t, p, sl, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
-    DIFF_hs_tp_L_Na(t, p, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp, sl, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
+    // DIFF_h_tp_L_Na(t, p, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+    // DIFF_s_tp_L_Na(t, p, sl, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
+    DIFF_hs_tp_L_Na(
+        t, p, hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp, sl, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
     dh = hl - h;
     ds = sl - s;
     ddhdt = dhdt;
@@ -2889,7 +3401,7 @@ FLASH_hs_G_Na(double h, double s, double & t, double & p)
   static const double tol_h = 1.e-6;
   static const double tol_s = 1.e-8;
   static const double tmin = 400. * 9. / 5.;
-  static const double tmax = 3000. * 9. / 5.;
+  static const double tmax = 2300. * 9. / 5.;
   static const double pmin = 1.e-5;
 
   double hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
@@ -2905,9 +3417,10 @@ FLASH_hs_G_Na(double h, double s, double & t, double & p)
   double ddhdt, ddhdp, ddsdt, ddsdp, den;
   while (fabs(dh) > tol_h || fabs(ds) > tol_s)
   {
-    //DIFF_h_tp_G_Na(t, p, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
-    //DIFF_s_tp_G_Na(t, p, sv, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
-    DIFF_hs_tp_G_Na(t, p, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp, sv, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
+    // DIFF_h_tp_G_Na(t, p, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp);
+    // DIFF_s_tp_G_Na(t, p, sv, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
+    DIFF_hs_tp_G_Na(
+        t, p, hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp, sv, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp);
     dh = hv - h;
     ds = sv - s;
     ddhdt = dhdt;
