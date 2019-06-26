@@ -30,7 +30,7 @@ Sodium7EqnFluidProperties::Sodium7EqnFluidProperties(const InputParameters & par
     params.set<MooseEnum>("emit_on_nan") = getParam<MooseEnum>("emit_on_nan");
     _fe_problem.addUserObject(class_name, _liquid_name, params);
   }
-  _fp_liquid = &_fe_problem.getUserObject<SinglePhaseFluidProperties>(_liquid_name);
+  _fp_liquid = &_fe_problem.getUserObjectTempl<SinglePhaseFluidProperties>(_liquid_name);
 
   {
     std::string class_name = "SodiumVaporFluidProperties";
@@ -38,7 +38,7 @@ Sodium7EqnFluidProperties::Sodium7EqnFluidProperties(const InputParameters & par
     params.set<MooseEnum>("emit_on_nan") = getParam<MooseEnum>("emit_on_nan");
     _fe_problem.addUserObject(class_name, _vapor_name, params);
   }
-  _fp_vapor = &_fe_problem.getUserObject<SinglePhaseFluidProperties>(_vapor_name);
+  _fp_vapor = &_fe_problem.getUserObjectTempl<SinglePhaseFluidProperties>(_vapor_name);
 }
 
 Real
