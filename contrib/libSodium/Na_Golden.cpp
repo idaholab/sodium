@@ -3038,7 +3038,7 @@ FLASH_vu_L_Na(double v, double u, double & t, double & p)
   static const double tol_u = 1.e-6;
   static const double tmin = 250. * 9. / 5.;
   static const double tmax = 2300. * 9. / 5.;
-  static const double pmin = 1.e-5;
+  static const double pmin = 1.e-4;
   static const double pmax = 1.e3;
   static const double atmft3_toBtu = (101325. * 0.3048 * 0.3048 * 0.3048) / 1055.05585262;
 
@@ -3127,7 +3127,7 @@ FLASH_vu_G_Na(double v, double u, double & t, double & p)
   static const double tol_u = 1.e-6;
   static const double tmin = 400. * 9. / 5.;
   static const double tmax = 2300. * 9. / 5.;
-  static const double pmin = 1.e-5;
+  static const double pmin = 1.e-4;
   static const double atmft3_toBtu = (101325. * 0.3048 * 0.3048 * 0.3048) / 1055.05585262;
 
   double vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
@@ -3207,7 +3207,7 @@ FLASH_vh_L_Na(double v, double h, double & t, double & p)
   static const double tol_h = 1.e-6;
   static const double tmin = 250. * 9. / 5.;
   static const double tmax = 2300. * 9. / 5.;
-  static const double pmin = 1.e-5;
+  static const double pmin = 1.e-4;
 
   double vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
@@ -3278,7 +3278,7 @@ FLASH_vh_G_Na(double v, double h, double & t, double & p)
   static const double tol_h = 1.e-6;
   static const double tmin = 400. * 9. / 5.;
   static const double tmax = 2300. * 9. / 5.;
-  static const double pmin = 1.e-5;
+  static const double pmin = 1.e-4;
 
   double vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
@@ -3349,7 +3349,7 @@ FLASH_hs_L_Na(double h, double s, double & t, double & p)
   static const double tol_s = 1.e-8;
   static const double tmin = 250. * 9. / 5.;
   static const double tmax = 2300. * 9. / 5.;
-  static const double pmin = 1.e-5;
+  static const double pmin = 1.e-4;
 
   double hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
   double sl, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
@@ -3402,7 +3402,7 @@ FLASH_hs_G_Na(double h, double s, double & t, double & p)
   static const double tol_s = 1.e-8;
   static const double tmin = 400. * 9. / 5.;
   static const double tmax = 2300. * 9. / 5.;
-  static const double pmin = 1.e-5;
+  static const double pmin = 1.e-4;
 
   double hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
   double sv, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
