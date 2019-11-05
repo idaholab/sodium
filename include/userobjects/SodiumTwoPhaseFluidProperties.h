@@ -3,23 +3,23 @@
 #include "TwoPhaseFluidProperties.h"
 #include "NaNInterface.h"
 
-class Sodium7EqnFluidProperties;
+class SodiumTwoPhaseFluidProperties;
 
 template <>
-InputParameters validParams<Sodium7EqnFluidProperties>();
+InputParameters validParams<SodiumTwoPhaseFluidProperties>();
 
 /**
- * Sodium interface for 7-eqn model
+ * Two-phase sodium fluid properties
  *
  * Range of validity:
  *   1.01325 Pa (1e-5 atm) <= p <= 101.325 MPa (1000 atm)
  *   250 K <= T <= 2300 K
  *
  */
-class Sodium7EqnFluidProperties : public TwoPhaseFluidProperties, public NaNInterface
+class SodiumTwoPhaseFluidProperties : public TwoPhaseFluidProperties, public NaNInterface
 {
 public:
-  Sodium7EqnFluidProperties(const InputParameters & parameters);
+  SodiumTwoPhaseFluidProperties(const InputParameters & parameters);
 
   virtual Real p_critical() const override;
   virtual Real T_sat(Real pressure) const override;

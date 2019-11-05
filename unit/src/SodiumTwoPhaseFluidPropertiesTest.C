@@ -1,7 +1,7 @@
-#include "Sodium7EqnFluidPropertiesTest.h"
+#include "SodiumTwoPhaseFluidPropertiesTest.h"
 #include "SinglePhaseFluidPropertiesTestUtils.h"
 
-TEST_F(Sodium7EqnFluidPropertiesTest, test)
+TEST_F(SodiumTwoPhaseFluidPropertiesTest, test)
 {
   Real T = 1200.;  // K
   Real p = 101325; // Pa

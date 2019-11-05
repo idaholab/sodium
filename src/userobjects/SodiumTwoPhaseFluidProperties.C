@@ -1,22 +1,23 @@
-#include "Sodium7EqnFluidProperties.h"
+#include "SodiumTwoPhaseFluidProperties.h"
 #include "SinglePhaseFluidProperties.h"
 #include "contrib/libSodium/Na_Golden.h"
 
-const Real Sodium7EqnFluidProperties::_P_critical = 25.64E+6;
+const Real SodiumTwoPhaseFluidProperties::_P_critical = 25.64E+6;
 
-registerMooseObject("SodiumApp", Sodium7EqnFluidProperties);
+registerMooseObject("SodiumApp", SodiumTwoPhaseFluidProperties);
+registerMooseObjectAliased("SodiumApp", SodiumTwoPhaseFluidProperties, "Sodium7EqnFluidProperties");
 
 template <>
 InputParameters
-validParams<Sodium7EqnFluidProperties>()
+validParams<SodiumTwoPhaseFluidProperties>()
 {
   InputParameters params = validParams<TwoPhaseFluidProperties>();
   params += validParams<NaNInterface>();
-  params.addClassDescription("Fluid properties of sodium for the 7-equation model.");
+  params.addClassDescription("Two-phase sodium fluid properties");
   return params;
 }
 
-Sodium7EqnFluidProperties::Sodium7EqnFluidProperties(const InputParameters & parameters)
+SodiumTwoPhaseFluidProperties::SodiumTwoPhaseFluidProperties(const InputParameters & parameters)
   : TwoPhaseFluidProperties(parameters),
     NaNInterface(this),
     _to_atm(1. / 101325.),
@@ -44,13 +45,13 @@ Sodium7EqnFluidProperties::Sodium7EqnFluidProperties(const InputParameters & par
 }
 
 Real
-Sodium7EqnFluidProperties::p_critical() const
+SodiumTwoPhaseFluidProperties::p_critical() const
 {
   return _P_critical;
 }
 
 Real
-Sodium7EqnFluidProperties::T_sat(Real pressure) const
+SodiumTwoPhaseFluidProperties::T_sat(Real pressure) const
 {
   pressure *= _to_atm;
 
@@ -68,7 +69,7 @@ Sodium7EqnFluidProperties::T_sat(Real pressure) const
 }
 
 Real
-Sodium7EqnFluidProperties::p_sat(Real temperature) const
+SodiumTwoPhaseFluidProperties::p_sat(Real temperature) const
 {
   temperature *= _to_R;
 
@@ -86,7 +87,7 @@ Sodium7EqnFluidProperties::p_sat(Real temperature) const
 }
 
 Real
-Sodium7EqnFluidProperties::dT_sat_dp(Real pressure) const
+SodiumTwoPhaseFluidProperties::dT_sat_dp(Real pressure) const
 {
   pressure *= _to_atm;
 
@@ -104,7 +105,7 @@ Sodium7EqnFluidProperties::dT_sat_dp(Real pressure) const
 }
 
 Real
-Sodium7EqnFluidProperties::sigma_from_T(Real T) const
+SodiumTwoPhaseFluidProperties::sigma_from_T(Real T) const
 {
   double sigma, dsigmadt, d2sigmadt2;
   sigma_t_Na(T, sigma, dsigmadt, d2sigmadt2);
@@ -112,7 +113,7 @@ Sodium7EqnFluidProperties::sigma_from_T(Real T) const
 }
 
 Real
-Sodium7EqnFluidProperties::dsigma_dT_from_T(Real T) const
+SodiumTwoPhaseFluidProperties::dsigma_dT_from_T(Real T) const
 {
   double sigma, dsigmadt, d2sigmadt2;
   sigma_t_Na(T, sigma, dsigmadt, d2sigmadt2);
