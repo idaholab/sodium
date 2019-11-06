@@ -5,7 +5,6 @@
 const Real SodiumTwoPhaseFluidProperties::_P_critical = 25.64E+6;
 
 registerMooseObject("SodiumApp", SodiumTwoPhaseFluidProperties);
-registerMooseObjectAliased("SodiumApp", SodiumTwoPhaseFluidProperties, "Sodium7EqnFluidProperties");
 
 template <>
 InputParameters
