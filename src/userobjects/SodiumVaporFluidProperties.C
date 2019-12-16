@@ -817,14 +817,16 @@ SodiumVaporFluidProperties::beta_from_p_T(
   dbeta_dp = (d2vdtdp * v - dvdt * dvdp) / (v * v);
 }
 
-// - molar mass depends on the presence of Na, Na2, and maybe even Na4 (monomer, dimer, tetramer)
-/*
 Real
 SodiumVaporFluidProperties::molarMass() const
 {
-  return xxx;
+  // Note that the molar mass can change based on the distribution of monomers,
+  // dimers, tetramers, etc. For now, the number used here is the molar weight
+  // one gets from a periodic table; it is the molar mass associated with only
+  // monomers, with a natural isotopic distribution.
+  return 22.989769e-3;
 }
-*/
+
 Real
 SodiumVaporFluidProperties::criticalTemperature() const
 {
