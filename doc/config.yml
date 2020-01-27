@@ -5,12 +5,12 @@ Content:
 
 Renderer:
     type: MooseDocs.base.MaterializeRenderer
-    name: sodium
-    repo: https://hpcgitlab.inl.gov/idaholab/sodium
-    home: https://hpcsc.inl.gov/ssl/SODIUM/site/
 
 Extensions:
     MooseDocs.extensions.navigation:
+        name: sodium
+        repo: https://hpcgitlab.inl.gov/idaholab/sodium
+        home: https://hpcsc.inl.gov/ssl/SODIUM/site/
         menu:
             Developers:
                 Workflow: workflow.md
