@@ -309,6 +309,41 @@ SodiumLiquidFluidProperties::k_from_v_e(Real v, Real e) const
   }
 }
 
+void
+SodiumLiquidFluidProperties::k_from_v_e(Real v, Real e, Real & k, Real & dk_dv, Real & dk_de) const
+{
+  v *= _to_ft3_lb;
+  e *= _to_Btu_lb;
+
+  double p, T;
+  int ierr = FLASH_vu_L_Na(v, e, T, p);
+  if (ierr != 0)
+  {
+    k = getNaN();
+    dk_dv = getNaN();
+    dk_de = getNaN();
+  }
+  else
+  {
+    double dkdt, d2kdt2;
+    lambdal_t_Na(T, k, dkdt, d2kdt2); // k in Btu/hr-ft-F
+
+    double v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
+    double u_, dudt, d2udt2, dudp, d2udp2, d2udtdp;
+    DIFF_vu_tp_L_Na(
+        T, p, v_, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp, u_, dudt, d2udt2, dudp, d2udp2, d2udtdp);
+
+    dk_dv = dkdt * dudp / (dvdt * dudp - dvdp * dudt);
+    dk_de = dkdt * dvdp / (dudt * dvdp - dudp * dvdt);
+
+    const double k_conv = _to_J / (_to_s * _to_m * _to_K);
+
+    k *= k_conv;
+    dk_dv *= k_conv / _to_m3_kg;
+    dk_de *= k_conv / _to_J_kg;
+  }
+}
+
 Real
 SodiumLiquidFluidProperties::s_from_v_e(Real v, Real e) const
 {
