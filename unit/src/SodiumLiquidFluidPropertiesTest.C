@@ -62,6 +62,7 @@ TEST_F(SodiumLiquidFluidPropertiesTest, test)
   const Real mu = _fp->mu_from_v_e(v, e);
   REL_TEST(mu, 0.00012410852760561553, REL_TOL_SAVED_VALUE);
   REL_TEST(_fp->mu_from_p_T(p, T), 0.00012410852760561553, REL_TOL_SAVED_VALUE);
+  DERIV_TEST(_fp->mu_from_v_e, v, e, REL_TOL_DERIVATIVE);
 
   // k
   const Real k = _fp->k_from_v_e(v, e);
