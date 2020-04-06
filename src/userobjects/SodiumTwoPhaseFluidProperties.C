@@ -6,12 +6,11 @@ const Real SodiumTwoPhaseFluidProperties::_P_critical = 25.64E+6;
 
 registerMooseObject("SodiumApp", SodiumTwoPhaseFluidProperties);
 
-template <>
 InputParameters
-validParams<SodiumTwoPhaseFluidProperties>()
+SodiumTwoPhaseFluidProperties::validParams()
 {
-  InputParameters params = validParams<TwoPhaseFluidProperties>();
-  params += validParams<NaNInterface>();
+  InputParameters params = TwoPhaseFluidProperties::validParams();
+  params += NaNInterface::validParams();
   params.addClassDescription("Two-phase sodium fluid properties");
   return params;
 }

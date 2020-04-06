@@ -3,11 +3,6 @@
 #include "SinglePhaseFluidProperties.h"
 #include "NaNInterface.h"
 
-class SodiumVaporFluidProperties;
-
-template <>
-InputParameters validParams<SodiumVaporFluidProperties>();
-
 /**
  * Fluid properties of sodium according to Golden et al. with some
  * modifications regarding the liquid phase (compressibility)
@@ -112,4 +107,7 @@ protected:
   const Real _to_Btu_lbR;
   /// Conversion factor from Btu/(lb R) to J/(kg K)
   const Real _to_J_kgK;
+
+public:
+  static InputParameters validParams();
 };
