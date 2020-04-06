@@ -3,11 +3,6 @@
 #include "TwoPhaseFluidProperties.h"
 #include "NaNInterface.h"
 
-class SodiumTwoPhaseFluidProperties;
-
-template <>
-InputParameters validParams<SodiumTwoPhaseFluidProperties>();
-
 /**
  * Two-phase sodium fluid properties
  *
@@ -43,4 +38,7 @@ protected:
   const Real _to_R;
   /// Conversion factor from R to K
   const Real _to_K;
+
+public:
+  static InputParameters validParams();
 };
