@@ -3,12 +3,11 @@
 
 registerMooseObject("SodiumApp", SodiumLiquidFluidProperties);
 
-template <>
 InputParameters
-validParams<SodiumLiquidFluidProperties>()
+SodiumLiquidFluidProperties::validParams()
 {
-  InputParameters params = validParams<SinglePhaseFluidProperties>();
-  params += validParams<NaNInterface>();
+  InputParameters params = SinglePhaseFluidProperties::validParams();
+  params += NaNInterface::validParams();
   params.addClassDescription("Fluid properties of sodium vapor.");
   return params;
 }
