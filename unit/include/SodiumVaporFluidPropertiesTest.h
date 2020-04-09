@@ -13,7 +13,7 @@ protected:
   {
     InputParameters uo_pars = _factory.getValidParams("SodiumVaporFluidProperties");
     _fe_problem->addUserObject("SodiumVaporFluidProperties", "fp", uo_pars);
-    _fp = &_fe_problem->getUserObjectTempl<SodiumVaporFluidProperties>("fp");
+    _fp = &_fe_problem->getUserObject<SodiumVaporFluidProperties>("fp");
   }
 
   const SodiumVaporFluidProperties * _fp;
