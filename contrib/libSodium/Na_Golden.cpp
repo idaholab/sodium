@@ -1286,10 +1286,16 @@ DIFF_qc_t_Na(double t,
                   (den * den * den * den);
   }
   x2 = u * x1 * x1;
+  x4 = 1. - x1 - x2;
+  // zero limit of tetramer
+  if (x4 < 1.e-16)
+  {
+    x2 = 1. - x1 - 1.e-16;
+    x4 = 1.e-16;
+  }
   dx2dt = dudt * x1 * x1 + u * 2. * x1 * dx1dt;
   d2x2dt2 = d2udt2 * x1 * x1 + dudt * 2. * x1 * dx1dt + dudt * 2. * x1 * dx1dt +
             u * 2. * dx1dt * dx1dt + u * 2. * x1 * d2x1dt2;
-  x4 = 1. - x1 - x2;
   dx4dt = -dx1dt - dx2dt;
   d2x4dt2 = -d2x1dt2 - d2x2dt2;
   abar = c * (x1 + 2. * x2 + 4. * x4);
@@ -1455,6 +1461,13 @@ DIFF_qc_tp_Na(double t,
                               (den * den * den * den);
   }
   x2 = u * x1 * x1;
+  x4 = 1. - x1 - x2;
+  // zero limit of tetramer
+  if (x4 < 1.e-16)
+  {
+    x2 = 1. - x1 - 1.e-16;
+    x4 = 1.e-16;
+  }
   dx2dt = dudt * x1 * x1 + u * 2. * x1 * dx1dt;
   d2x2dt2 = d2udt2 * x1 * x1 + dudt * 2. * x1 * dx1dt + dudt * 2. * x1 * dx1dt +
             u * 2. * dx1dt * dx1dt + u * 2. * x1 * d2x1dt2;
@@ -1463,7 +1476,6 @@ DIFF_qc_tp_Na(double t,
             u * 2. * dx1dp * dx1dp + u * 2. * x1 * d2x1dp2;
   d2x2dtdp = d2udtdp * x1 * x1 + dudt * 2. * x1 * dx1dp + dudp * 2. * x1 * dx1dt +
              u * 2. * dx1dp * dx1dt + u * 2. * x1 * d2x1dtdp;
-  x4 = 1. - x1 - x2;
   dx4dt = -dx1dt - dx2dt;
   d2x4dt2 = -d2x1dt2 - d2x2dt2;
   dx4dp = -dx1dp - dx2dp;
@@ -2827,7 +2839,7 @@ int
 FLASH_prho_G_Na(double p, double rho, double & t)
 {
   static const double tol_v = 1.e-6;
-  static const double tmin = 400. * 9. / 5.;
+  static const double tmin = 350. * 9. / 5.;
   static const double tmax = 2300. * 9. / 5.;
 
   double ts, dtsdp, d2tsdp2;
@@ -2927,7 +2939,7 @@ int
 FLASH_ph_G_Na(double p, double h, double & t)
 {
   static const double tol_h = 1.e-6;
-  static const double tmin = 400. * 9. / 5.;
+  static const double tmin = 350. * 9. / 5.;
   static const double tmax = 2300. * 9. / 5.;
 
   double ts, dtsdp, d2tsdp2;
@@ -2999,7 +3011,7 @@ int
 FLASH_ps_G_Na(double p, double s, double & t)
 {
   static const double tol_s = 1.e-8;
-  static const double tmin = 400. * 9. / 5.;
+  static const double tmin = 350. * 9. / 5.;
   static const double tmax = 2300. * 9. / 5.;
 
   double ts, dtsdp, d2tsdp2;
@@ -3038,7 +3050,7 @@ FLASH_vu_L_Na(double v, double u, double & t, double & p)
   static const double tol_u = 1.e-6;
   static const double tmin = 250. * 9. / 5.;
   static const double tmax = 2300. * 9. / 5.;
-  static const double pmin = 1.e-4;
+  static const double pmin = 1.e-10;
   static const double pmax = 1.e3;
   static const double atmft3_toBtu = (101325. * 0.3048 * 0.3048 * 0.3048) / 1055.05585262;
 
@@ -3121,23 +3133,95 @@ DERIV_vu_L_Na(
 }
 //
 int
+DIFF_sat_v2_Na(double v, double & ts)
+{ // units: ft3/lb, R
+  double v2, dv2dt, d2v2dt2;
+
+  static const double tol_v = 1.e-6;
+  static const double tmin = 250. * 9. / 5.;
+  static const double tmax = 2300. * 9. / 5.;
+  static const double tnb = 1154.7 * 9. / 5.;
+  // initial guess from normal boiling point in R
+  ts = tnb;
+
+  int it = 0;
+  double dv = 1.e12;
+  double ln_v = log(v);
+  while (fabs(dv) / v > tol_v)
+  {
+    DIFF_v2_t_Na(ts, v2, dv2dt, d2v2dt2);
+    dv = v2 - v;
+    dv2dt = dv2dt / v2;
+    ts -= (log(v2) - ln_v) / dv2dt;
+    if (ts < tmin)
+    {
+      ts = tmin;
+    }
+    else if (ts > tmax)
+    {
+      ts = tmax;
+    }
+    if (++it > 20)
+    {
+      return -1;
+    }
+  }
+  return 0;
+}
+//
+int
+DIFF_sat_h2_Na(double h, double & ts)
+{ // units: Btu/lb, R
+  double h2, dh2dt, d2h2dt2;
+
+  static const double tol_h = 1.e-6;
+  static const double tmin = 250. * 9. / 5.;
+  static const double tmax = 2300. * 9. / 5.;
+  static const double tnb = 1154.7 * 9. / 5.;
+  // initial guess from normal boiling point in R
+  ts = tnb;
+
+  int it = 0;
+  double dh = 1.e12;
+  while (fabs(dh) > tol_h)
+  {
+    DIFF_h2_t_Na(ts, h2, dh2dt, d2h2dt2);
+    dh = h2 - h;
+    ts -= dh / dh2dt;
+    if (ts < tmin)
+    {
+      ts = tmin;
+    }
+    else if (ts > tmax)
+    {
+      ts = tmax;
+    }
+    if (++it > 20)
+    {
+      return -1;
+    }
+  }
+  return 0;
+}
+//
+int
 FLASH_vu_G_Na(double v, double u, double & t, double & p)
 {
   static const double tol_v = 1.e-6;
   static const double tol_u = 1.e-6;
-  static const double tmin = 400. * 9. / 5.;
+  static const double tmin = 350. * 9. / 5.;
   static const double tmax = 2300. * 9. / 5.;
-  static const double pmin = 1.e-4;
+  static const double pmin = 1.e-10;
   static const double atmft3_toBtu = (101325. * 0.3048 * 0.3048 * 0.3048) / 1055.05585262;
 
   double vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
   double uv;
 
-  // initial guess from normal boiling point in R
-  static const double tnb = 1154.7 * 9. / 5.;
-  t = tnb;
-  p = 1.;
+  // temperature guess at dew curve
+  double dpsdt, d2psdt2;
+  DIFF_sat_v2_Na(v, t);
+  DIFF_ps_t_Na(t, p, dpsdt, d2psdt2);
 
   int it = 0;
   double dv = 1.e12, du = 1.e12;
@@ -3207,7 +3291,7 @@ FLASH_vh_L_Na(double v, double h, double & t, double & p)
   static const double tol_h = 1.e-6;
   static const double tmin = 250. * 9. / 5.;
   static const double tmax = 2300. * 9. / 5.;
-  static const double pmin = 1.e-4;
+  static const double pmin = 1.e-10;
 
   double vl, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
@@ -3276,17 +3360,17 @@ FLASH_vh_G_Na(double v, double h, double & t, double & p)
 {
   static const double tol_v = 1.e-6;
   static const double tol_h = 1.e-6;
-  static const double tmin = 400. * 9. / 5.;
+  static const double tmin = 350. * 9. / 5.;
   static const double tmax = 2300. * 9. / 5.;
-  static const double pmin = 1.e-4;
+  static const double pmin = 1.e-10;
 
   double vv, dvdt, d2vdt2, dvdp, d2vdp2, d2vdtdp;
   double hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
 
-  // initial guess from normal boiling point in R
-  static const double tnb = 1154.7 * 9. / 5.;
-  t = tnb;
-  p = 1.;
+  // temperature guess at dew curve
+  double dpsdt, d2psdt2;
+  DIFF_sat_v2_Na(v, t);
+  DIFF_ps_t_Na(t, p, dpsdt, d2psdt2);
 
   int it = 0;
   double dv = 1.e12, dh = 1.e12;
@@ -3349,7 +3433,7 @@ FLASH_hs_L_Na(double h, double s, double & t, double & p)
   static const double tol_s = 1.e-8;
   static const double tmin = 250. * 9. / 5.;
   static const double tmax = 2300. * 9. / 5.;
-  static const double pmin = 1.e-4;
+  static const double pmin = 1.e-10;
 
   double hl, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
   double sl, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
@@ -3400,17 +3484,17 @@ FLASH_hs_G_Na(double h, double s, double & t, double & p)
 {
   static const double tol_h = 1.e-6;
   static const double tol_s = 1.e-8;
-  static const double tmin = 400. * 9. / 5.;
+  static const double tmin = 350. * 9. / 5.;
   static const double tmax = 2300. * 9. / 5.;
-  static const double pmin = 1.e-4;
+  static const double pmin = 1.e-10;
 
   double hv, dhdt, d2hdt2, dhdp, d2hdp2, d2hdtdp;
   double sv, dsdt, d2sdt2, dsdp, d2sdp2, d2sdtdp;
 
-  // initial guess from normal boiling point in R
-  static const double tnb = 1154.7 * 9. / 5.;
-  t = tnb;
-  p = 1.;
+  // temperature guess at dew curve
+  double dpsdt, d2psdt2;
+  DIFF_sat_h2_Na(h, t);
+  DIFF_ps_t_Na(t, p, dpsdt, d2psdt2);
 
   int it = 0;
   double dh = 1.e12, ds = 1.e12;
