@@ -13,7 +13,7 @@ protected:
   {
     InputParameters uo_pars = _factory.getValidParams("SodiumTwoPhaseFluidProperties");
     _fe_problem->addUserObject("SodiumTwoPhaseFluidProperties", "fp", uo_pars);
-    _fp = &_fe_problem->getUserObjectTempl<SodiumTwoPhaseFluidProperties>("fp");
+    _fp = &_fe_problem->getUserObject<SodiumTwoPhaseFluidProperties>("fp");
   }
 
   const SodiumTwoPhaseFluidProperties * _fp;
