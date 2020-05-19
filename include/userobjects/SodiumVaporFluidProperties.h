@@ -3,6 +3,9 @@
 #include "SinglePhaseFluidProperties.h"
 #include "NaNInterface.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverloaded-virtual"
+
 /**
  * Fluid properties of sodium according to Golden et al. with some
  * modifications regarding the liquid phase (compressibility)
@@ -111,3 +114,5 @@ protected:
 public:
   static InputParameters validParams();
 };
+
+#pragma GCC diagnostic pop
