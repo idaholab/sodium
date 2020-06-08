@@ -64,8 +64,9 @@ SodiumTwoPhaseFluidProperties::T_sat(Real pressure) const
 {
   pressure *= _to_atm;
 
-  static const double p0 = 1.E-8 * 0.101325; // just a lower limit, not actual triple point press.
-  static const double pc = 25.64 * 0.101325;
+  // Limits taken as p_sat @ T = 350 K and T = 2500 K
+  static const double p0 = 1.5210548366e-06 * _to_atm;
+  static const double pc = 2.4232774980e+07 * _to_atm;
 
   if (p0 <= pressure && pressure <= pc)
   {
@@ -100,8 +101,9 @@ SodiumTwoPhaseFluidProperties::dT_sat_dp(Real pressure) const
 {
   pressure *= _to_atm;
 
-  static const double p0 = 1.E-8 * 0.101325; // just a lower limit, not actual triple point press.
-  static const double pc = 25.64 * 0.101325;
+  // Limits taken as p_sat @ T = 350 K and T = 2500 K
+  static const double p0 = 1.5210548366e-06 * _to_atm;
+  static const double pc = 2.4232774980e+07 * _to_atm;
 
   if (p0 <= pressure && pressure <= pc)
   {
