@@ -4,6 +4,11 @@
 
 const Real SodiumTwoPhaseFluidProperties::_P_critical = 25.64E+6;
 
+// Value is taken from NIST Chemistry WebBook, SRD 69.
+// Original reference:
+// R. E. Honing and D. A. Kramer. Vapor pressure data for the solid andn liquid elements (1969)
+const Real SodiumTwoPhaseFluidProperties::_T_triple = 370.98;
+
 registerMooseObject("SodiumApp", SodiumTwoPhaseFluidProperties);
 
 InputParameters
@@ -46,6 +51,12 @@ Real
 SodiumTwoPhaseFluidProperties::p_critical() const
 {
   return _P_critical;
+}
+
+Real
+SodiumTwoPhaseFluidProperties::T_triple() const
+{
+  return _T_triple;
 }
 
 Real
