@@ -226,6 +226,7 @@ DIFF_ts_p_Na(double p, double & ts, double & dtsdp, double & d2tsdp2)
   static const double tmin = 250. * 9. / 5.;
   static const double tmax = 2300. * 9. / 5.;
   static const double tnb = 1154.7 * 9. / 5.;
+  static const int ts_max_it = 30;
   // initial guess from normal boiling point in R
   ts = tnb;
 
@@ -244,7 +245,7 @@ DIFF_ts_p_Na(double p, double & ts, double & dtsdp, double & d2tsdp2)
     {
       ts = tmax;
     }
-    if (++it > 20)
+    if (++it > ts_max_it)
     {
       return -1;
     }
