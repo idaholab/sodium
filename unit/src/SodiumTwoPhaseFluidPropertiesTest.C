@@ -10,6 +10,7 @@ TEST_F(SodiumTwoPhaseFluidPropertiesTest, test)
   REL_TEST(_fp->T_triple(), 370.98, REL_TOL_SAVED_VALUE);
 
   // Tsat
+  REL_TEST(_fp->T_sat(_fp->p_sat(371.0)), 371.0, REL_TOL_CONSISTENCY);
   REL_TEST(_fp->T_sat(p), 1154.6031110050355, REL_TOL_SAVED_VALUE);
   DERIV_TEST_1D(_fp->T_sat, _fp->dT_sat_dp, p, REL_TOL_DERIVATIVE);
 
