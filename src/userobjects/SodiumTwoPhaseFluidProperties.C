@@ -6,8 +6,16 @@ const Real SodiumTwoPhaseFluidProperties::_P_critical = 25.64E+6;
 
 // Value is taken from NIST Chemistry WebBook, SRD 69.
 // Original reference:
-// R. E. Honing and D. A. Kramer. Vapor pressure data for the solid andn liquid elements (1969)
+// R. E. Honing and D. A. Kramer. Vapor pressure data for the solid and liquid elements (1969)
 const Real SodiumTwoPhaseFluidProperties::_T_triple = 370.98;
+
+// Value is taken from the following reference:
+//
+// O. J. Foust. Sodium-NaK Engineering Handbook, Volume 1: Sodium Chemistry and Physical Properties
+// (1972). Division of Reactor Development and Technology, United States Atomic Energy Commission.
+//
+// Value given was 27 cal/g, which was converted to J/kg.
+const Real SodiumTwoPhaseFluidProperties::_L_fusion = 0.112968;
 
 registerMooseObject("SodiumApp", SodiumTwoPhaseFluidProperties);
 
@@ -57,6 +65,12 @@ Real
 SodiumTwoPhaseFluidProperties::T_triple() const
 {
   return _T_triple;
+}
+
+Real
+SodiumTwoPhaseFluidProperties::L_fusion() const
+{
+  return _L_fusion;
 }
 
 Real
