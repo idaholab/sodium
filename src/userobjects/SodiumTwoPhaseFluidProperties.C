@@ -15,7 +15,7 @@ const Real SodiumTwoPhaseFluidProperties::_T_triple = 370.98;
 // (1972). Division of Reactor Development and Technology, United States Atomic Energy Commission.
 //
 // Value given was 27 cal/g, which was converted to J/kg.
-const Real SodiumTwoPhaseFluidProperties::_L_fusion = 0.112968;
+const Real SodiumTwoPhaseFluidProperties::_L_fusion = 112968.0;
 
 registerMooseObject("SodiumApp", SodiumTwoPhaseFluidProperties);
 

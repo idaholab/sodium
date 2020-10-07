@@ -10,7 +10,7 @@ TEST_F(SodiumTwoPhaseFluidPropertiesTest, test)
   REL_TEST(_fp->T_triple(), 370.98, REL_TOL_SAVED_VALUE);
 
   // L_fusion
-  REL_TEST(_fp->L_fusion(), 0.112968, REL_TOL_SAVED_VALUE);
+  REL_TEST(_fp->L_fusion(), 112968.0, REL_TOL_SAVED_VALUE);
 
   // Tsat
   REL_TEST(_fp->T_sat(_fp->p_sat(371.0)), 371.0, REL_TOL_CONSISTENCY);
