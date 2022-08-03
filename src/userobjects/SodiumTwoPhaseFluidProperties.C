@@ -1,6 +1,6 @@
 #include "SodiumTwoPhaseFluidProperties.h"
 #include "SinglePhaseFluidProperties.h"
-#include "contrib/libSodium/Na_Golden.h"
+#include "contrib/libSodiumProperties/Na_Golden.h"
 
 const Real SodiumTwoPhaseFluidProperties::_P_critical = 25.64E+6;
 
