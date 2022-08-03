@@ -38,7 +38,7 @@ FLUID_PROPERTIES  := yes
 include           $(MOOSE_DIR)/modules/modules.mk
 ###############################################################################
 
-include $(SODIUM_DIR)/libSodium.mk
+include $(SODIUM_DIR)/libSodiumProperties.mk
 
 # dep apps
 APPLICATION_DIR    := $(SODIUM_DIR)

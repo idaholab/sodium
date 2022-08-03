@@ -1,14 +1,14 @@
 #
-# build libSodium using libMesh's build system
+# build libSodiumProperties using libMesh's build system
 #
-LIBSODIUM_DIR       := $(SODIUM_DIR)/contrib/libSodium
+LIBSODIUM_DIR       := $(SODIUM_DIR)/contrib/libSodiumProperties
 
 LIBSODIUM_srcfiles  :=
 LIBSODIUM_srcfiles  += $(LIBSODIUM_DIR)/Na_Golden.cpp
 
 LIBSODIUM_objects   := $(patsubst %.cpp, %.$(obj-suffix), $(LIBSODIUM_srcfiles))
 LIBSODIUM_deps      := $(patsubst %.$(obj-suffix), %.$(obj-suffix).d, $(LIBSODIUM_objects))
-LIBSODIUM_LIB       := $(LIBSODIUM_DIR)/libSodium-$(METHOD).la
+LIBSODIUM_LIB       := $(LIBSODIUM_DIR)/libSodiumProperties-$(METHOD).la
 
 app_INCLUDES += -I$(SODIUM_DIR)
 app_LIBS += $(LIBSODIUM_LIB)
@@ -24,10 +24,10 @@ $(app_EXEC): $(LIBSODIUM_LIB)
 -include $(LIBSODIUM_deps)
 
 cleanlibsodium:
-	@echo "Cleaning libSodium"
+	@echo "Cleaning libSodiumProperties"
 	@rm -f $(LIBSODIUM_objects)
 	@rm -f $(LIBSODIUM_deps)
 	@rm -f $(LIBSODIUM_LIB)
-	@rm -f $(LIBSODIUM_DIR)/libSodium-$(METHOD)*.dylib
-	@rm -f $(LIBSODIUM_DIR)/libSodium-$(METHOD)*.so*
-	@rm -f $(LIBSODIUM_DIR)/libSodium-$(METHOD)*.a
+	@rm -f $(LIBSODIUM_DIR)/libSodiumProperties-$(METHOD)*.dylib
+	@rm -f $(LIBSODIUM_DIR)/libSodiumProperties-$(METHOD)*.so*
+	@rm -f $(LIBSODIUM_DIR)/libSodiumProperties-$(METHOD)*.a
