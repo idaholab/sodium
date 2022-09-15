@@ -517,7 +517,7 @@ SodiumVaporFluidProperties::s_from_h_p(Real h, Real p, Real & s, Real & ds_dh, R
 }
 
 Real
-SodiumVaporFluidProperties::T_from_h_p(Real h, Real p) const
+SodiumVaporFluidProperties::T_from_p_h(Real p, Real h) const
 {
   p *= _to_atm;
   h *= _to_Btu_lb;
@@ -536,7 +536,7 @@ SodiumVaporFluidProperties::T_from_h_p(Real h, Real p) const
 }
 
 void
-SodiumVaporFluidProperties::T_from_h_p(Real h, Real p, Real & T, Real & dT_dh, Real & dT_dp) const
+SodiumVaporFluidProperties::T_from_p_h(Real p, Real h, Real & T, Real & dT_dp, Real & dT_dh) const
 {
   p *= _to_atm;
   h *= _to_Btu_lb;
