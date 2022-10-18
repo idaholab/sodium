@@ -31,14 +31,6 @@ public:
   virtual bool supportsPhaseChange() const override { return true; }
 
 protected:
-  // Critical pressure
-  static const Real _P_critical;
-  // Triple-point temperature
-  static const Real _T_triple;
-  // Latent heat of fusion
-  static const Real _L_fusion;
-
-protected:
   /// Conversion factor from Pa to atm
   const Real _to_atm;
   /// Conversion factor from atm to Pa
@@ -50,6 +42,13 @@ protected:
 
 public:
   static InputParameters validParams();
+
+  // Critical pressure
+  static const Real _P_critical;
+  // Triple-point temperature
+  static const Real _T_triple;
+  // Latent heat of fusion
+  static const Real _L_fusion;
 };
 
 #pragma GCC diagnostic pop
