@@ -1,1 +1,1 @@
-!template load file=sqa/app_rtm.md.template app=SodiumApp category=sodium
+!template load file=sqa/app_rtm.md.template app=Sodium category=sodium

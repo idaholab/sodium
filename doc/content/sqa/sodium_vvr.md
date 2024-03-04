@@ -1,1 +1,1 @@
-!template load file=sqa/app_vvr.md.template app=SodiumApp category=sodium
+!template load file=sqa/app_vvr.md.template app=Sodium category=sodium

@@ -1,9 +1,9 @@
-!template load file=sqa/app_stp.md.template app=SodiumApp category=sodium
+!template load file=sqa/app_stp.md.template app=Sodium category=sodium
 
 !template! item key=system-purpose
-{{app}} is a module to compute the fluid properties of sodium, whether liquid, vapor of two-phases, using Spline-Based Table lookups (SBTL) for MOOSE applications.
+{{app}} is a module to compute the fluid properties of sodium, whether liquid, vapor, or a two-phase mixture, using Spline-Based Table lookups (SBTL) for MOOSE applications.
 SBTL is a fast method of computing properties from pre-generated tables of fluid properties. The {{app}} can compute properties such as
-density, specific heat or viscosity over the range of validity in pressure and temperature that the input data was defined on.
+density, specific heat, or viscosity over the range of validity in pressure and temperature that the input data was defined on.
 Liquid sodium fluid properties are useful to perform thermal hydraulic simulations of Sodium-cooled Fast Reactors (SFRs). SFRs are
 an advanced reactor concept currently under investigation in the United States by several private companies with support from
 national laboratories. Two-phase sodium fluid properties can be used to study accidental transients such as boiling in SFRs. Both vapor
