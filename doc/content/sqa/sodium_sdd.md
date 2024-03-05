@@ -17,5 +17,5 @@ Vapor sodium properties share the same [SinglePhaseFluidProperties.md] base clas
 base class from the MOOSE Fluid Properties module. An additional variable, the phase fraction, is added to compute fluid properties such as density or specific heat.
 
 As with any fluid property, the ranges of validity of these fluid properties used are finite. They are documented in the class documentation
-for the fluid property user object for SBTL Sodium fluid properties. {{app}} may error if these properties are queried outside
+for the fluid property user object. {{app}} may error if these properties are queried outside
 of their range of validity, depending on the user-selected out-of-bounds behavior.
