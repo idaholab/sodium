@@ -13,7 +13,7 @@
 #include "AppFactory.h"
 
 // Modules
-#include "FluidPropertiesApp.h"
+#include "ModulesApp.h"
 
 InputParameters
 SodiumApp::validParams()
@@ -25,8 +25,7 @@ SodiumApp::validParams()
 
 registerKnownLabel("SodiumApp");
 
-SodiumApp::SodiumApp(InputParameters parameters)
-  : MooseApp(parameters)
+SodiumApp::SodiumApp(InputParameters parameters) : MooseApp(parameters)
 {
   SodiumApp::registerAll(_factory, _action_factory, _syntax);
 }
@@ -44,6 +43,7 @@ SodiumApp::registerApps()
   registerApp(SodiumApp);
 }
 
+// External entry point for dynamic application loading
 extern "C" void
 SodiumApp__registerAll(Factory & f, ActionFactory & af, Syntax & s)
 {
@@ -56,12 +56,5 @@ SodiumApp::registerAll(Factory & f, ActionFactory & af, Syntax & s)
   Registry::registerObjectsTo(f, {"SodiumApp"});
   Registry::registerActionsTo(af, {"SodiumApp"});
 
-  FluidPropertiesApp::registerAll(f, af, s);
-}
-
-void
-SodiumApp::registerObjects(Factory & factory)
-{
-  mooseDeprecated("SodiumApp: use registerAll instead of registerObjects");
-  Registry::registerObjectsTo(factory, {"SodiumApp"});
+  ModulesApp::registerAllObjects<SodiumApp>(f, af, s);
 }
