@@ -28,8 +28,7 @@
  * - dynamic viscosity:  lb/(hr ft)
  * - conductivity:       Btu/(hr ft R)
  */
-class SodiumLiquidFluidProperties : public SinglePhaseFluidProperties,
-                                    public NaNInterface
+class SodiumLiquidFluidProperties : public SinglePhaseFluidProperties, public NaNInterface
 {
 public:
   SodiumLiquidFluidProperties(const InputParameters & parameters);
