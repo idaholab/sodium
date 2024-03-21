@@ -73,6 +73,7 @@ include/base/SodiumRevision.h
 include/SodiumRevision.h
 build
 .tags
+sodium.yaml
 
 # Allow output files in gold directories
 !**/gold/*.e
