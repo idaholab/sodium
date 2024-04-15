@@ -13,7 +13,9 @@
 #include "AppFactory.h"
 
 // Modules
+#ifndef SKIP_MODULE_LOAD
 #include "ModulesApp.h"
+#endif
 
 InputParameters
 SodiumApp::validParams()
@@ -56,5 +58,8 @@ SodiumApp::registerAll(Factory & f, ActionFactory & af, Syntax & s)
   Registry::registerObjectsTo(f, {"SodiumApp"});
   Registry::registerActionsTo(af, {"SodiumApp"});
 
+  libmesh_ignore(s);
+#ifndef SKIP_MODULE_LOAD
   ModulesApp::registerAllObjects<SodiumApp>(f, af, s);
+#endif
 }
