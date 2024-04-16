@@ -1,0 +1,6 @@
+dependencies:
+    - framework
+    - fluid_properties
+repos:
+    default: https://github.inl.gov/idaholab/sodium
+reports: !include ${SODIUM_DIR}/doc/sqa_reports.yml
