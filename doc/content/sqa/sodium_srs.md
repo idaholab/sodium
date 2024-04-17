@@ -1,4 +1,4 @@
-!template load file=sqa/app_stp.md.template app=Sodium category=sodium
+!template load file=sqa/app_srs.md.template app=Sodium category=sodium
 
 !template! item key=system-purpose
 {{app}} is a module to compute the fluid properties of sodium, whether liquid, vapor, or a two-phase mixture for MOOSE applications.
