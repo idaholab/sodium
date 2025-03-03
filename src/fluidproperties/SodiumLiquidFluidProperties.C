@@ -8,6 +8,7 @@
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "SodiumLiquidFluidProperties.h"
+#include "SodiumConstants.h"
 #include "contrib/libSodiumProperties/Na_Golden.h"
 
 registerMooseObject("SodiumApp", SodiumLiquidFluidProperties);
@@ -930,22 +931,20 @@ SodiumLiquidFluidProperties::beta_from_p_T(
   dbeta_dp = (d2vdtdp * v - dvdt * dvdp) / (v * v);
 }
 
-// - molar mass depends on the presence of Na, Na2, and maybe even Na4 (monomer, dimer, tetramer)
-/*
 Real
 SodiumLiquidFluidProperties::molarMass() const
 {
-  return xxx;
-}
-*/
-Real
-SodiumLiquidFluidProperties::criticalTemperature() const
-{
-  return 2503.7;
+  return SodiumConstants::molar_mass;
 }
 
 Real
-SodiumLiquidFluidProperties::criticalDensity() const
+SodiumLiquidFluidProperties::criticalTemperature() const
 {
-  return 219.;
+  return SodiumConstants::critical_temperature;
+}
+
+Real
+SodiumLiquidFluidProperties::criticalPressure() const
+{
+  return SodiumConstants::critical_pressure;
 }
