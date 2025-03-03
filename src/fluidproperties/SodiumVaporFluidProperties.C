@@ -8,6 +8,7 @@
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
 #include "SodiumVaporFluidProperties.h"
+#include "SodiumConstants.h"
 #include "contrib/libSodiumProperties/Na_Golden.h"
 
 registerMooseObject("SodiumApp", SodiumVaporFluidProperties);
@@ -933,21 +934,17 @@ SodiumVaporFluidProperties::beta_from_p_T(
 Real
 SodiumVaporFluidProperties::molarMass() const
 {
-  // Note that the molar mass can change based on the distribution of monomers,
-  // dimers, tetramers, etc. For now, the number used here is the molar weight
-  // one gets from a periodic table; it is the molar mass associated with only
-  // monomers, with a natural isotopic distribution.
-  return 22.989769e-3;
+  return SodiumConstants::molar_mass;
 }
 
 Real
 SodiumVaporFluidProperties::criticalTemperature() const
 {
-  return 2503.7;
+  return SodiumConstants::critical_temperature;
 }
 
 Real
-SodiumVaporFluidProperties::criticalDensity() const
+SodiumVaporFluidProperties::criticalPressure() const
 {
-  return 219.;
+  return SodiumConstants::critical_pressure;
 }
