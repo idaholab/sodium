@@ -9,6 +9,7 @@
 
 #include "SodiumVaporFluidPropertiesTest.h"
 #include "SinglePhaseFluidPropertiesTestUtils.h"
+#include "SodiumConstants.h"
 
 TEST_F(SodiumVaporFluidPropertiesTest, test)
 {
@@ -97,8 +98,8 @@ TEST_F(SodiumVaporFluidPropertiesTest, test)
   DERIV_TEST(_fp->beta_from_p_T, p, T, REL_TOL_DERIVATIVE);
 
   // critical parameters
-  REL_TEST(_fp->criticalTemperature(), 2503.7, REL_TOL_SAVED_VALUE);
-  REL_TEST(_fp->criticalDensity(), 219., REL_TOL_SAVED_VALUE);
+  REL_TEST(_fp->criticalTemperature(), SodiumConstants::critical_temperature, REL_TOL_SAVED_VALUE);
+  REL_TEST(_fp->criticalPressure(), SodiumConstants::critical_pressure, REL_TOL_SAVED_VALUE);
 }
 
 TEST_F(SodiumVaporFluidPropertiesTest, test_bs)
