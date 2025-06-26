@@ -27,7 +27,7 @@ SodiumApp::validParams()
 
 registerKnownLabel("SodiumApp");
 
-SodiumApp::SodiumApp(InputParameters parameters) : MooseApp(parameters)
+SodiumApp::SodiumApp(const InputParameters & parameters) : MooseApp(parameters)
 {
   SodiumApp::registerAll(_factory, _action_factory, _syntax);
 }

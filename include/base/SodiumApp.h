@@ -16,7 +16,7 @@ class Factory;
 class SodiumApp : public MooseApp
 {
 public:
-  SodiumApp(InputParameters parameters);
+  SodiumApp(const InputParameters & parameters);
 
 public:
   static InputParameters validParams();
